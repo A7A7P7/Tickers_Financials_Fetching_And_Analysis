@@ -75,31 +75,6 @@ n_years_used_for_averages_in_investment_factor = int(input("NºYEARS USED FOR AV
 
 dict_tickers_main_metrics = ff_helpers.yield_ticker_metrics(tickers_considered,dict_profit,dict_value_factor,dict_beta_factor,dict_momentum_factor,dict_investment,dict_scores,n_years_used_for_averages_in_profit_factor,n_years_used_for_averages_in_investment_factor)
 
-#%%
-
-def yield_ticker_metrics(possible_tickers:list,profit_data:dict,value_data:dict,beta_data:dict,momentum_data:dict,investment_data:dict,final_score:dict,years_used_in_profit_factor_avg:int,years_used_in_investment_factor_avg:int):
-
-    all_tickers_metrics = dict()
-
-    for ticker in possible_tickers:
-
-        all_tickers_metrics[ticker] = dict()
-
-        all_tickers_metrics[ticker]['Final_Score'] = final_score[ticker]
-        all_tickers_metrics[ticker][f"Op_Margin_{years_used_in_profit_factor_avg}y_AVG_AbsVal"] = profit_data[ticker][f"Op_Margin_{years_used_in_profit_factor_avg}y_AVG_AbsVal"]
-        all_tickers_metrics[ticker]["ROE_Debt_Adjusted_%Val"] = profit_data[ticker]["ROE_Debt_Adjusted_%Val"]
-        all_tickers_metrics[ticker]['P/E'] = value_data[ticker]['P/E']
-        all_tickers_metrics[ticker]['P/B'] = value_data[ticker]['P/B']
-        all_tickers_metrics[ticker][f"Gross_FixAsset_Inc_{years_used_in_investment_factor_avg}y_AVG_AbsVal"] = investment_data[ticker][f"Gross_FixAsset_Inc_{years_used_in_investment_factor_avg}y_AVG_AbsVal"]
-        all_tickers_metrics[ticker]['Momentum_Factor'] = momentum_data[ticker]['Momentum_Factor']
-        all_tickers_metrics[ticker]['Beta'] = beta_data[ticker]['Beta']
-    
-    return all_tickers_metrics
-
-dict_tickers_main_metrics = yield_ticker_metrics(tickers_considered,dict_profit,dict_value_factor,dict_beta_factor,dict_momentum_factor,dict_investment,dict_scores,7,7)
-#%%
-
-dict_tickers_main_metrics
 
 #%%
 
