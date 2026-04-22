@@ -693,13 +693,13 @@ dict_all_financials['bal_sheet']['EOAN.DE'][50:]
 
 """
 
-path for balance sheet excel -  "C:\Users\Afons\Python_Files\Projects\Import_Financial_Statements\afonso_screener_v2\output\normalized\ticker\bal_sheet.csv"
+path for balance sheet excel -  "C:\\Users\\Afons\\Python_Files\\Projects\\Import_Financial_Statements\\afonso_screener_v2\\output\\normalized\\ticker\\bal_sheet.csv"
 
-path for income statement excel - "C:\Users\Afons\Python_Files\Projects\Import_Financial_Statements\afonso_screener_v2\output\normalized\ticker\inc_stat.csv"
+path for income statement excel - "C:\\Users\\Afons\\Python_Files\\Projects\\Import_Financial_Statements\\afonso_screener_v2\\output\\normalized\\ticker\\inc_stat.csv"
 
-path for stat of cash flows excel - "C:\Users\Afons\Python_Files\Projects\Import_Financial_Statements\afonso_screener_v2\output\normalized\ticker\stat_cfs.csv"
+path for stat of cash flows excel - "C:\\Users\\Afons\\Python_Files\\Projects\\Import_Financial_Statements\\afonso_screener_v2\\output\\normalized\\ticker\\stat_cfs.csv"
 
-directory_to_tickers = r"C:\Users\Afons\Python_Files\Projects\Import_Financial_Statements\afonso_screener_v2\output\normalized"
+directory_to_tickers = r"C:\\Users\\Afons\\Python_Files\\Projects\\Import_Financial_Statements\\afonso_screener_v2\\output\\normalized"
 
 """
 

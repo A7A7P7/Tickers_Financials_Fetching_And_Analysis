@@ -593,12 +593,12 @@ def use_stored_or_updated_financials(dict_three_statements,tickers_lst,directory
 
 def fetch_update_or_get_from_directory(dict_three_statements:dict,tickers_lst:list,directory_for_storage_or_retrieval):
 
-    first_time = str(input("IS IT YOUR 1ST TIME USING THE SCRIPT: "))
+    first_time = str(input("IS IT YOUR 1ST TIME USING THE SCRIPT (ANSWER 'Yes' OR 'No'): "))
 
     while first_time.upper() != "YES" and first_time.upper() != "NO":
 
         print("WRONG INPUT, USE 'Yes' OR 'No'")
-        first_time = str(input("IS IT YOUR 1ST TIME USING THE SCRIPT: "))
+        first_time = str(input("IS IT YOUR 1ST TIME USING THE SCRIPT (ANSWER 'Yes' OR 'No'): "))
     
     if first_time.upper() == "YES" :
 
