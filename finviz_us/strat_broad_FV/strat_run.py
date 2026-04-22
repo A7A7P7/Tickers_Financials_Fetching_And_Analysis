@@ -1,5 +1,6 @@
 #%%
 from finviz_us.organize_tickers import organizing_tickers
+from finviz_us.strat_broad_FV.helpers_func import helpers
 #%%
 
 """IT WILL ASK YOU FOR THE NUMBER OF THE INDEXES, TO GET THE MAXIMUM OF THE TICKERS, YOU WILL:
