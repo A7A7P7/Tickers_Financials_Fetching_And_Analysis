@@ -1,7 +1,7 @@
 #%%
 
 #IMPORT HELPER FUNCTIONS NEEDED
-from finviz_us.organize_tickers.helpers_finviz import helpers_func
+from finviz_us.data_tickers_and_strats.organize_tickers.helpers_finviz import helpers_func
 
 #%%
 

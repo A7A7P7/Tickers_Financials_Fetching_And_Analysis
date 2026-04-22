@@ -5,8 +5,8 @@
 
 #%%
 
-from organize_tickers import organizing_tickers
-from help_func import help_func
+from finviz_us.data_tickers_and_strats.organize_tickers import organizing_tickers
+from finviz_us.data_tickers_and_strats.miscellaneous.help_func import help_func
 
 #%%
 

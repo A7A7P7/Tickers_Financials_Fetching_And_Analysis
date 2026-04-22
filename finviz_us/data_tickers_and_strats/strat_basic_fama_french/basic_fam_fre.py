@@ -1,7 +1,8 @@
 #%%
 
-from finviz_us.organize_tickers import organizing_tickers
-from finviz_us.strat_basic_fama_french.fama_french_helpers import ff_helpers
+from finviz_us.data_tickers_and_strats.organize_tickers import organizing_tickers
+#%%
+from finviz_us.data_tickers_and_strats.strat_basic_fama_french.fama_french_helpers import ff_helpers
 
 #REPX,SD,VITL,CL,CMRE,NOG,AMPY,CPRT,CALM,REI,RIG,VAL,EPM,OXY,ADBE
 
