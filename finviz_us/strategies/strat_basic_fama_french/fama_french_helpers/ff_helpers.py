@@ -27,24 +27,24 @@ def ticker_profitability_factor(tickers,dict_financials):
         for i in range(len(cols_df_bs)):
 
             count_col_recurrence.append(cols_df_bs.count(cols_df_bs[i]))
-        
+
         if count_col_recurrence.count(1) != len(count_col_recurrence): #CHANGES IN REPORTING, SO TICKER IS DROPPED
 
             unusable_tickers.append(ticker)
-        
+
         else:
 
             possible_tickers.append(ticker)
 
     #get Operating Income of Past 5y and average
-        #Needs Income Statement to get Revenues and Operating Income 
+        #Needs Income Statement to get Revenues and Operating Income
     n_years_lookback_to_compute_average = int(input('NUMBER OF YEARS TO CONSIDER FOR AVERAGES: '))
 
     while n_years_lookback_to_compute_average < 1 or n_years_lookback_to_compute_average > 8 :
 
         print("NUMBER BETWEEN 1 AND 7")
         n_years_lookback_to_compute_average = int(input('NUMBER OF YEARS TO CONSIDER FOR AVERAGES: '))
-    
+
     for ticker in possible_tickers:
 
         dict_profitability[ticker] = dict()
@@ -59,9 +59,9 @@ def ticker_profitability_factor(tickers,dict_financials):
         if float(operating_margin_avg) == float("inf") or float(operating_margin_avg) == float("-inf"): #ANY TICKER HAS REVENUE OF 0
 
             dict_profitability[ticker][f"Op_Margin_{n_years_lookback_to_compute_average}y_AVG_AbsVal"] = "ANY TICKER HAS REVENUE OF 0 IN OF THE YEARS CONSIDERED"
-        
+
         else:
-        
+
             dict_profitability[ticker][f"Op_Margin_{n_years_lookback_to_compute_average}y_AVG_AbsVal"] = float(operating_margin_avg)
 
         #ROE AND DEBT ADJUSTMENT
@@ -70,7 +70,7 @@ def ticker_profitability_factor(tickers,dict_financials):
         record_roe = pd.to_numeric(ticker_bs.loc['Return on Equity'][0:n_years_lookback_to_compute_average])
         record_debt = pd.to_numeric(ticker_bs.loc['Long Term Debt'][0:n_years_lookback_to_compute_average]) + pd.to_numeric(ticker_bs.loc['Short Term Debt Incl. Current Port. of LT Debt'][0:n_years_lookback_to_compute_average])
         record_equity = pd.to_numeric(ticker_bs.loc['Total Shareholders Equity'][0:n_years_lookback_to_compute_average])
-    
+
         if n_years_lookback_to_compute_average < 5:
 
             roe_debt_adjusted_avg = (record_roe * (1 - (record_debt/(record_debt+record_equity)))).mean().__round__(2)
@@ -102,7 +102,7 @@ def ticker_profitability_factor(tickers,dict_financials):
             dict_profitability[ticker][f"ROE_Debt_Adjusted_%Val"] = "VALUES CANNOT BE COMPUTED, EITHER ROE, DEBT OR EQUITY HAVE INCOMPATIBLE VALUES"
 
         else:
-        
+
             dict_profitability[ticker][f"ROE_Debt_Adjusted_%Val"] = float(roe_debt_adjusted_avg)
 
         if type(dict_profitability[ticker][f"Op_Margin_{n_years_lookback_to_compute_average}y_AVG_AbsVal"]) == str or type(dict_profitability[ticker][f"ROE_Debt_Adjusted_%Val"]) == str:
@@ -112,7 +112,7 @@ def ticker_profitability_factor(tickers,dict_financials):
         else:
 
             dict_profitability[ticker]["Profitability_Factor_AbsVal"] = ((dict_profitability[ticker][f"Op_Margin_{n_years_lookback_to_compute_average}y_AVG_AbsVal"] + dict_profitability[ticker][f"ROE_Debt_Adjusted_%Val"]/100) / 2).__round__(2)
-        
+
         #print(f"{ticker} Profitability_Factor : ",dict_profitability[ticker]["Profitability_Factor_AbsVal"])
 
     return [dict_profitability,possible_tickers,unusable_tickers]
@@ -125,7 +125,7 @@ def ticker_profitability_factor(tickers,dict_financials):
 def ticker_value_factor(tickers):
 
     dict_value = dict()
-    
+
     for ticker in tickers:
 
         dict_value[ticker] = dict()
@@ -139,7 +139,7 @@ def ticker_value_factor(tickers):
         if "-" in price_earnings:
 
             dict_value[ticker]['P/E'] = "No Earnings"
-        
+
         else:
 
             dict_value[ticker]['P/E'] = float(price_earnings).__round__(2)
@@ -147,11 +147,11 @@ def ticker_value_factor(tickers):
         if "-" in price_book:
 
             dict_value[ticker]['P/B'] = "Negative Equity"
-        
+
         else:
 
             dict_value[ticker]['P/B'] = float(price_book).__round__(2)
-        
+
         if type(dict_value[ticker]['P/B']) != type(0.0) or type(dict_value[ticker]['P/E']) != type(0.0):
 
             dict_value[ticker]['AVG_Value_Metrics'] = "Not Available, Either Current Equity or Earnings are Negative"
@@ -169,7 +169,7 @@ def ticker_value_factor(tickers):
 def ticker_beta(tickers):
 
     dict_beta = dict()
-    
+
     for ticker in tickers:
 
         dict_beta[ticker] = dict()
@@ -182,11 +182,11 @@ def ticker_beta(tickers):
             if beta == "-":
 
                 beta = f"{ticker} DOESN'T HAVE A BETA VALUE IN FINVIZ"
-            
+
             else:
 
                 beta = float(beta.replace("-","")) * (-1)
-        
+
         else:
 
             beta = float(beta)
@@ -204,7 +204,7 @@ def ticker_beta(tickers):
 def ticker_momentum(tickers):
 
     dict_momentum = dict()
-    
+
     for ticker in tickers:
 
         dict_momentum[ticker] = dict()
@@ -223,11 +223,11 @@ def ticker_momentum(tickers):
             else:
 
                 past_month_performance = float(past_month_performance.replace("-","")) * (-1) / 100 #PUT IN %
-        
+
         else:
-        
+
             past_month_performance = float(past_month_performance) / 100 #PUT IN %
-        
+
         if "-" in past_year_performance: #IT COMES AS A STRING, SO TO TURN INTO FLOAT, ONE NEEDS TO REMOVE NON-NUMBER CHARACTERS
 
             if past_year_performance == "-": #BASICALLY TICKERS THAT ARE RECENTLY IN THE STOCK MARKET AREN'T INCLUDED
@@ -237,14 +237,14 @@ def ticker_momentum(tickers):
             else:
 
                 past_year_performance = float(past_year_performance.replace("-","")) * (-1) / 100 #PUT IN %
-        
+
         else:
-        
+
             past_year_performance = float(past_year_performance) / 100 #PUT IN %
-        
+
         if type(past_month_performance) == float and type(past_year_performance) == float:
 
-        
+
             momentum_factor = ((1+past_year_performance)/(1+past_month_performance)) - 1
             dict_momentum[ticker]['Momentum_Factor'] = momentum_factor
 
@@ -264,14 +264,14 @@ def ticker_investment_factor(tickers,dict_financials):
     dict_investment = dict()
 
     #get Operating Income of Past 5y and average
-        #Needs Income Statement to get Revenues and Operating Income 
+        #Needs Income Statement to get Revenues and Operating Income
     n_years_lookback_to_compute_average = int(input('NUMBER OF YEARS TO CONSIDER FOR AVERAGES: '))
 
     while n_years_lookback_to_compute_average < 1 or n_years_lookback_to_compute_average > 8 :
 
         print("NUMBER BETWEEN 1 AND 7")
         n_years_lookback_to_compute_average = int(input('NUMBER OF YEARS TO CONSIDER FOR AVERAGES: '))
-    
+
     for ticker in tickers:
 
         dict_investment[ticker] = dict()
@@ -326,7 +326,7 @@ def standardized_raking_sector_buys(tickers_lst:list,profit_data:dict,value_data
         if combined_cond:
 
             poss_first_filter.append(ticker)
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -347,14 +347,14 @@ def standardized_raking_sector_buys(tickers_lst:list,profit_data:dict,value_data
         all_factors_exist = profit_factor_exists and value_factor_exists and beta_factor_exists and momentum_factor_exists and investment_factor_exists
 
         if all_factors_exist:
-            
+
             possible_tickers.append(ticker)
             profitability_data.append(profit_factor)
             valuation_data.append(value_factor)
-            beta_numbers.append(beta_factor)
+            beta_numbers.append(abs(beta_factor))
             momentum_numbers.append(momentum_factor)
             investment_numbers.append(investment_factor)
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -363,49 +363,52 @@ def standardized_raking_sector_buys(tickers_lst:list,profit_data:dict,value_data
     profit_mean = np.mean(profitability_data)
     profit_std = np.std(profitability_data)
 
-    #print("Profit_Mean: ",profit_mean,"And Profit_Std: ",profit_std)
-
     #Value Distribution
-    value_mean = np.mean(valuation_data)
+    value_mean = np.mean(valuation_data) #ALWAYS POSITIVE, NO NEGATIVE P/E OR P/B
     value_std = np.std(valuation_data)
+    valuation_data_mean_centered_zero = []
 
-    #print("Value_Mean: ",value_mean,"And Value_Std: ",value_std)
+    for value in valuation_data:
+
+        val_centered = value - value_mean
+        valuation_data_mean_centered_zero.append(val_centered)
+
 
     #Beta Distribution
     beta_mean = np.mean(beta_numbers)
     beta_std = np.std(beta_numbers)
 
-    #print("Beta_Mean: ",beta_mean,"And Beta_Std: ",beta_std)
+    beta_tickers_distance_from_zero = beta_numbers
+    beta_dist_mean_centered_zero = []
+
+    for beta in beta_tickers_distance_from_zero:
+
+        val_centered = beta - beta_mean
+        beta_dist_mean_centered_zero.append(val_centered)
 
     #Momentum Distribution
     mom_mean = np.mean(momentum_numbers)
     mom_std = np.std(momentum_numbers)
 
-    #print("Mom_Mean: ",mom_mean,"And Mom_Std: ",mom_std)
 
     #Investment Distribution
     investment_mean = np.mean(investment_numbers)
     investment_std = np.std(investment_numbers)
 
-    #print("Investment_Mean: ",investment_mean,"And Investment_Std: ",investment_std)
-
     for ticker in possible_tickers:
 
+        idx_ticker = possible_tickers.index(ticker)
+
         profit_metric = (profit_data[ticker]["Profitability_Factor_AbsVal"] - profit_mean) / profit_std
-        #print(f"{ticker} Profit_Metric_Standardized: ",profit_metric)
-        value_metric = (value_data[ticker]["AVG_Value_Metrics"] - value_mean) / value_std
-        #print(f"{ticker} Value_Metric_Standardized: ",value_metric)
-        beta_metric = (beta_data[ticker]["Beta"] - beta_mean) / beta_std
-        #print(f"{ticker} Beta_Metric_Standardized: ",beta_metric)
+        value_metric = valuation_data_mean_centered_zero[idx_ticker] / value_std
+        beta_metric = beta_dist_mean_centered_zero[idx_ticker] / beta_std
         mom_metric = (momentum_data[ticker]['Momentum_Factor'] - mom_mean) / mom_std
-        #print(f"{ticker} Momentum_Metric_Standardized: ",mom_metric)
         investment_metric = (investment_data[ticker]["Investment_Factor_AbsVal"] - investment_mean) / investment_std
-        #print(f"{ticker} Investment_Metric_Standardized: ",investment_metric)
-        
+
         ticker_score = ((1/5)*(profit_metric-value_metric-beta_metric+mom_metric-investment_metric)).round(decimals = 3)
         #SINCE LOWER VALUE,BETA AND INVESTMENT IS BETTER, ONE TURNS THEM POSITIVE BY PUTTING MINUS
         dict_final_score[ticker] = ticker_score
-    
+
     dict_copy = dict_final_score.copy()
     dict_final_score_ordered = {}
 
@@ -418,7 +421,7 @@ def standardized_raking_sector_buys(tickers_lst:list,profit_data:dict,value_data
         ticker_max = list_keys[idx_max_score]
         dict_final_score_ordered[ticker_max] = max_score
         del dict_copy[ticker_max]
-    
+
     dict_final_score = dict_final_score_ordered
 
     return [dict_final_score,possible_tickers,unusable_tickers]
@@ -449,7 +452,7 @@ def standardized_raking_sector_buys_no_momentum(tickers_lst:list,profit_data:dic
         if combined_cond:
 
             poss_first_filter.append(ticker)
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -470,14 +473,14 @@ def standardized_raking_sector_buys_no_momentum(tickers_lst:list,profit_data:dic
         all_factors_exist = profit_factor_exists and value_factor_exists and beta_factor_exists and momentum_factor_exists and investment_factor_exists
 
         if all_factors_exist:
-            
+
             possible_tickers.append(ticker)
             profitability_data.append(profit_factor)
             valuation_data.append(value_factor)
             beta_numbers.append(beta_factor)
             momentum_numbers.append(momentum_factor)
             investment_numbers.append(investment_factor)
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -486,49 +489,52 @@ def standardized_raking_sector_buys_no_momentum(tickers_lst:list,profit_data:dic
     profit_mean = np.mean(profitability_data)
     profit_std = np.std(profitability_data)
 
-    #print("Profit_Mean: ",profit_mean,"And Profit_Std: ",profit_std)
-
     #Value Distribution
-    value_mean = np.mean(valuation_data)
+    value_mean = np.mean(valuation_data) #ALWAYS POSITIVE, NO NEGATIVE P/E OR P/B
     value_std = np.std(valuation_data)
+    valuation_data_mean_centered_zero = []
 
-    #print("Value_Mean: ",value_mean,"And Value_Std: ",value_std)
+    for value in valuation_data:
+
+        val_centered = value - value_mean
+        valuation_data_mean_centered_zero.append(val_centered)
+
 
     #Beta Distribution
     beta_mean = np.mean(beta_numbers)
     beta_std = np.std(beta_numbers)
 
-    #print("Beta_Mean: ",beta_mean,"And Beta_Std: ",beta_std)
+    beta_tickers_distance_from_zero = beta_numbers
+    beta_dist_mean_centered_zero = []
+
+    for beta in beta_tickers_distance_from_zero:
+
+        val_centered = beta - beta_mean
+        beta_dist_mean_centered_zero.append(val_centered)
 
     #Momentum Distribution
     mom_mean = np.mean(momentum_numbers)
     mom_std = np.std(momentum_numbers)
 
-    #print("Mom_Mean: ",mom_mean,"And Mom_Std: ",mom_std)
 
     #Investment Distribution
     investment_mean = np.mean(investment_numbers)
     investment_std = np.std(investment_numbers)
 
-    #print("Investment_Mean: ",investment_mean,"And Investment_Std: ",investment_std)
-
     for ticker in possible_tickers:
 
+        idx_ticker = possible_tickers.index(ticker)
+
         profit_metric = (profit_data[ticker]["Profitability_Factor_AbsVal"] - profit_mean) / profit_std
-        #print(f"{ticker} Profit_Metric_Standardized: ",profit_metric)
-        value_metric = (value_data[ticker]["AVG_Value_Metrics"] - value_mean) / value_std
-        #print(f"{ticker} Value_Metric_Standardized: ",value_metric)
-        beta_metric = (beta_data[ticker]["Beta"] - beta_mean) / beta_std
-        #print(f"{ticker} Beta_Metric_Standardized: ",beta_metric)
+        value_metric = valuation_data_mean_centered_zero[idx_ticker] / value_std
+        beta_metric = beta_dist_mean_centered_zero[idx_ticker] / beta_std
         mom_metric = (momentum_data[ticker]['Momentum_Factor'] - mom_mean) / mom_std
-        #print(f"{ticker} Momentum_Metric_Standardized: ",mom_metric)
         investment_metric = (investment_data[ticker]["Investment_Factor_AbsVal"] - investment_mean) / investment_std
-        #print(f"{ticker} Investment_Metric_Standardized: ",investment_metric)
-        
+
         ticker_score = ((1/4)*(profit_metric-value_metric-beta_metric-investment_metric)).round(decimals = 3)
         #SINCE LOWER VALUE,BETA AND INVESTMENT IS BETTER, ONE TURNS THEM POSITIVE BY PUTTING MINUS
         dict_final_score[ticker] = ticker_score
-    
+
     dict_copy = dict_final_score.copy()
     dict_final_score_ordered = {}
 
@@ -541,11 +547,10 @@ def standardized_raking_sector_buys_no_momentum(tickers_lst:list,profit_data:dic
         ticker_max = list_keys[idx_max_score]
         dict_final_score_ordered[ticker_max] = max_score
         del dict_copy[ticker_max]
-    
+
     dict_final_score = dict_final_score_ordered
 
     return [dict_final_score,possible_tickers,unusable_tickers]
-
 
 def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_data:dict,momentum_data:dict,investment_data:dict):
 
@@ -572,7 +577,7 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
         if combined_cond:
 
             poss_first_filter.append(ticker)
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -593,7 +598,7 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
         all_factors_exist = profit_factor_exists and value_factor_exists and beta_factor_exists and momentum_factor_exists and investment_factor_exists
 
         if all_factors_exist:
-            
+
             possible_tickers.append(ticker)
             profitability_data.append(profit_factor)
             valuation_data.append(value_factor)
@@ -601,7 +606,7 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
             beta_diff_from_zero.append(abs(beta_factor) - 0)
             momentum_numbers.append(momentum_factor)
             investment_numbers.append(investment_factor)
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -610,11 +615,19 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
     profit_mean = np.mean(profitability_data)
     profit_std = np.std(profitability_data)
 
-    #print("Profit_Mean: ",profit_mean,"And Profit_Std: ",profit_std)
-
     #Value Distribution
     value_mean = np.mean(valuation_data)
     value_std = np.std(valuation_data)
+
+    #ADJUSTMENT OF THE DISTRIBUTION TO HAVE MEAN ZERO AS MEAN IS POSITIVE
+    #IMPORTANT TO CHANGE THE RANGE OF VALUES THAT VALUE FACTOR WILL
+    #TO MAKE THE RANGE FROM [0,100] POSSIBLE
+    mean_value_adjusted_to_zero = []
+
+    for value in valuation_data:
+
+        new_val = value - value_mean
+        mean_value_adjusted_to_zero.append(new_val)
 
     #print("Value_Mean: ",value_mean,"And Value_Std: ",value_std)
 
@@ -622,53 +635,171 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
     beta_mean = np.mean(beta_numbers)
     beta_std = np.std(beta_numbers)
 
-    #print("Beta_Mean: ",beta_mean,"And Beta_Std: ",beta_std)
+    #ADJUSTMENT OF THE DISTRIBUTION
+    beta_difference_from_zero = []
+
+    for beta in beta_numbers:
+
+        if beta == 0 or beta == 0.0:
+
+            beta = 0.001
+
+        beta_difference_from_zero.append(abs(beta))
+
+    beta_diff_mean = np.mean(beta_difference_from_zero)
+
+    #ADJUSTMENT OF THE DISTRIBUTION TO HAVE MEAN ZERO AS MEAN IS POSITIVE, MOST STOCKS HAVE POSITIVE BETA
+    #IMPORTANT TO CHANGE THE RANGE OF VALUES THAT BETA FACTOR WILL HAVE
+    #TO MAKE THE RANGE FROM [0,100] POSSIBLE, AS THAT WOULDN'T BE POSSIBLE BECAUSE ABS DISTANCE WAS ALWAYS POSITIVE
+    beta_diff_adjusted_zero_mean = [] #NEGATIVE VALUES ARE CLOSE TO ZERO, POSITIVE ARE FARTHER FROM ZERO
+
+    for beta_diff in beta_difference_from_zero:
+
+        adjust_mean_zero = beta_diff - beta_diff_mean
+        beta_diff_adjusted_zero_mean.append(adjust_mean_zero)
 
     #Momentum Distribution
     mom_mean = np.mean(momentum_numbers)
     mom_std = np.std(momentum_numbers)
 
-    #print("Mom_Mean: ",mom_mean,"And Mom_Std: ",mom_std)
-
     #Investment Distribution
     investment_mean = np.mean(investment_numbers)
     investment_std = np.std(investment_numbers)
 
-    #print("Investment_Mean: ",investment_mean,"And Investment_Std: ",investment_std)
-
     for ticker in possible_tickers:
 
-        profit_metric = (profit_data[ticker]["Profitability_Factor_AbsVal"] - profit_mean) / profit_std
-        #print(f"{ticker} Profit_Metric_Standardized: ",profit_metric)
-        value_metric = (value_data[ticker]["AVG_Value_Metrics"] - value_mean) / value_std
-        #print(f"{ticker} Value_Metric_Standardized: ",value_metric)
-        beta_metric = (beta_data[ticker]["Beta"] - beta_mean) / beta_std
-        #print(f"{ticker} Beta_Metric_Standardized: ",beta_metric)
-        mom_metric = (momentum_data[ticker]['Momentum_Factor'] - mom_mean) / mom_std
-        #print(f"{ticker} Momentum_Metric_Standardized: ",mom_metric)
-        investment_metric = (investment_data[ticker]["Investment_Factor_AbsVal"] - investment_mean) / investment_std
-        #print(f"{ticker} Investment_Metric_Standardized: ",investment_metric)
+        #VALUE AND BETA SUFFERED ADJUSTMENTS
+        ticker_profit_factor = profit_data[ticker]["Profitability_Factor_AbsVal"]
+        ticker_momentum_factor = momentum_data[ticker]['Momentum_Factor']
+        ticker_investment_factor = investment_data[ticker]["Investment_Factor_AbsVal"]
 
-        how_profitable = profit_data[ticker]["Profitability_Factor_AbsVal"] / max(profitability_data)
-        how_undervalued = (1/value_data[ticker]["AVG_Value_Metrics"]) / (1/min(valuation_data))
-        proxy_beta = 0.001
-        if beta_data[ticker]["Beta"] == 0:
+        #PROFIT_FACTOR MEASUREMENTS
 
-            how_low_beta = 1
-            how_close_beta_from_0 = 1
-        
-        else:
+        max_profit_factor = max(profitability_data)
+        min_profit_factor = min(profitability_data)
+        max_profit = max_profit_factor > 0
+        min_profit = min_profit_factor > 0
 
-            how_low_beta = (1/beta_data[ticker]["Beta"]) / (1/proxy_beta)
-            how_close_beta_from_0 = (1/(float(abs(beta_data[ticker]["Beta"]).__round__(2)) - 0)) / (1/(proxy_beta))
-        
-        how_high_momentum = momentum_data[ticker]['Momentum_Factor'] / max(momentum_numbers)
-        how_invested = (1/investment_data[ticker]["Investment_Factor_AbsVal"]) / (1/min(investment_numbers))
-        
-        ticker_score = ((1/5)*(how_profitable + how_undervalued + how_low_beta + how_high_momentum + how_invested)).round(decimals = 3)
+        if max_profit and min_profit:
+
+            how_profitable = ticker_profit_factor / max_profit_factor
+
+        elif max_profit and min_profit == False :
+
+            if ticker_profit_factor >= 0 :
+
+                how_profitable = ticker_profit_factor / max_profit_factor
+
+            else:
+
+                how_profitable = - (ticker_profit_factor / min_profit_factor)
+
+        else: #max_profit == False and min_profit == False, max_profit == False and min_profit == True doesn't exist
+
+            how_profitable = - (ticker_profit_factor / min_profit_factor)
+
+        #VALUE_FACTOR MEASUREMENTS~
+
+        max_value_factor = max(mean_value_adjusted_to_zero)
+        min_value_factor = min(mean_value_adjusted_to_zero)
+        max_value = max_value_factor > 0
+        min_value = min_value_factor > 0
+        idx_ticker_possible_tickers = possible_tickers.index(ticker)
+        ticker_value_adjust_factor = mean_value_adjusted_to_zero[idx_ticker_possible_tickers]
+
+        if max_value and min_value == False :
+
+            if ticker_value_adjust_factor >= 0 :
+
+                how_undervalued = - (ticker_value_adjust_factor / max_value_factor) #HIGHER VALUATIONS MEAN SUBTRACTION IN FINAL WEIGHT
+
+            else:
+
+                how_undervalued = ticker_value_adjust_factor / min_value_factor #LOWER VALUATION HAVE MORE WEIGHT IN FINAL SCORE
+
+        #BETA_FACTOR MEASUREMENTS
+
+        max_beta_factor = max(beta_diff_adjusted_zero_mean)
+        min_beta_factor = min(beta_diff_adjusted_zero_mean)
+        max_beta = max_beta_factor > 0
+        min_beta = min_beta_factor > 0
+        idx_ticker_possible_tickers = possible_tickers.index(ticker)
+        ticker_beta_diff_factor = beta_diff_adjusted_zero_mean[idx_ticker_possible_tickers]
+
+
+        if max_beta and min_beta:
+
+            how_low_abs_beta =  - (ticker_beta_diff_factor / max_beta_factor) #BETA FURTHER FROM ZERO
+
+        elif max_beta and min_beta == False :
+
+            if ticker_beta_diff_factor >= 0 :
+
+                how_low_abs_beta = - (ticker_beta_diff_factor / max_beta_factor) #BETA FURTHER FROM ZERO
+
+            else:
+
+                how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+
+        else: #max_profit == False and min_profit == False, max_profit == False and min_profit == True doesn't exist
+
+            how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+
+        #MOMENTUM_FACTOR MEASUREMENTS
+
+        max_momentum_factor = max(momentum_numbers)
+        min_momentum_factor = min(momentum_numbers)
+        max_mom = max_momentum_factor > 0
+        min_mom = min_momentum_factor > 0
+
+        if max_mom and min_mom:
+
+            how_healthy_momentum = ticker_momentum_factor / max_momentum_factor
+
+        elif max_mom and min_mom == False :
+
+            if ticker_momentum_factor >= 0 :
+
+                how_healthy_momentum = ticker_momentum_factor / max_momentum_factor
+
+            else:
+
+                how_healthy_momentum = - (ticker_momentum_factor / min_momentum_factor)
+
+        else: #max_mom == False and min_mom == False, max_mom == False and min_mom == True doesn't exist
+
+            how_healthy_momentum = - (ticker_momentum_factor / min_momentum_factor)
+
+
+        #INVESTMENT_FACTOR MEASUREMENTS, ASSUMES TOTAL ASSETS ARE NEVER NEGATIVE
+
+        max_investment_factor = max(investment_numbers)
+        min_investment_factor = min(investment_numbers)
+        max_inv = max_investment_factor > 0
+        min_inv = min_investment_factor > 0
+
+        if max_inv and min_inv:
+
+            how_invested = - (ticker_investment_factor / max_investment_factor)
+
+        elif max_inv and min_inv == False :
+
+            if ticker_investment_factor >= 0 :
+
+                how_invested = - (ticker_investment_factor / max_investment_factor)
+
+            else:
+
+                how_invested = ticker_investment_factor / min_investment_factor
+
+        else: #max_mom == False and min_mom == False, max_mom == False and min_mom == True doesn't exist
+
+            how_invested = ticker_investment_factor / min_investment_factor
+
+        ticker_score = ((1/5)*(how_profitable + how_undervalued + how_low_abs_beta + how_healthy_momentum + how_invested)).round(decimals = 3)
         #SINCE LOWER VALUE,BETA AND INVESTMENT IS BETTER, ONE TURNS THEM POSITIVE BY PUTTING MINUS
-        dict_final_score[ticker] = ticker_score
-    
+        dict_final_score[ticker] = ticker_score * 100
+
     dict_copy = dict_final_score.copy()
     dict_final_score_ordered = {}
 
@@ -681,7 +812,7 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
         ticker_max = list_keys[idx_max_score]
         dict_final_score_ordered[ticker_max] = max_score
         del dict_copy[ticker_max]
-    
+
     dict_final_score = dict_final_score_ordered
 
     return [dict_final_score,possible_tickers,unusable_tickers]
@@ -711,7 +842,7 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
         if combined_cond:
 
             poss_first_filter.append(ticker)
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -732,7 +863,7 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
         all_factors_exist = profit_factor_exists and value_factor_exists and beta_factor_exists and momentum_factor_exists and investment_factor_exists
 
         if all_factors_exist:
-            
+
             possible_tickers.append(ticker)
             profitability_data.append(profit_factor)
             valuation_data.append(value_factor)
@@ -740,7 +871,7 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
             beta_diff_from_zero.append(abs(beta_factor) - 0)
             momentum_numbers.append(momentum_factor)
             investment_numbers.append(investment_factor)
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -755,11 +886,39 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
     value_mean = np.mean(valuation_data)
     value_std = np.std(valuation_data)
 
+    #ADJUSTMENT OF THE DISTRIBUTION
+    mean_value_adjusted_to_zero = []
+
+    for value in valuation_data:
+
+        new_val = value - value_mean
+        mean_value_adjusted_to_zero.append(new_val)
+
     #print("Value_Mean: ",value_mean,"And Value_Std: ",value_std)
 
     #Beta Distribution
     beta_mean = np.mean(beta_numbers)
     beta_std = np.std(beta_numbers)
+
+    #ADJUSTMENT OF THE DISTRIBUTION
+    beta_difference_from_zero = []
+
+    for beta in beta_numbers:
+
+        if beta == 0 or beta == 0.0:
+
+            beta = 0.001
+
+        beta_difference_from_zero.append(abs(beta))
+
+    beta_diff_mean = np.mean(beta_difference_from_zero)
+
+    beta_diff_adjusted_zero_mean = [] #NEGATIVE VALUES ARE CLOSE TO ZERO, POSITIVE ARE FARTHER FROM ZERO
+
+    for beta_diff in beta_difference_from_zero:
+
+        adjust_mean_zero = beta_diff - beta_diff_mean
+        beta_diff_adjusted_zero_mean.append(adjust_mean_zero)
 
     #print("Beta_Mean: ",beta_mean,"And Beta_Std: ",beta_std)
 
@@ -773,9 +932,16 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
     investment_mean = np.mean(investment_numbers)
     investment_std = np.std(investment_numbers)
 
+
     #print("Investment_Mean: ",investment_mean,"And Investment_Std: ",investment_std)
 
     for ticker in possible_tickers:
+
+        ticker_profit_factor = profit_data[ticker]["Profitability_Factor_AbsVal"]
+        ticker_value_factor = value_data[ticker]["P/B"]
+        ticker_beta_factor = beta_data[ticker]["Beta"]
+        ticker_momentum_factor = momentum_data[ticker]['Momentum_Factor']
+        ticker_investment_factor = investment_data[ticker]["Investment_Factor_AbsVal"]
 
         profit_metric = (profit_data[ticker]["Profitability_Factor_AbsVal"] - profit_mean) / profit_std
         #print(f"{ticker} Profit_Metric_Standardized: ",profit_metric)
@@ -788,26 +954,133 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
         investment_metric = (investment_data[ticker]["Investment_Factor_AbsVal"] - investment_mean) / investment_std
         #print(f"{ticker} Investment_Metric_Standardized: ",investment_metric)
 
-        how_profitable = profit_data[ticker]["Profitability_Factor_AbsVal"] / max(profitability_data)
-        how_undervalued = (1/value_data[ticker]["P/B"]) / (1/min(valuation_data))
-        proxy_beta = 0.001
-        if beta_data[ticker]["Beta"] == 0:
+        #PROFIT_FACTOR MEASUREMENTS
 
-            how_low_beta = 1
-            how_close_beta_from_0 = 1
-        
-        else:
+        max_profit_factor = max(profitability_data)
+        min_profit_factor = min(profitability_data)
+        max_profit = max_profit_factor > 0
+        min_profit = min_profit_factor > 0
 
-            how_low_beta = (1/beta_data[ticker]["Beta"]) / (1/proxy_beta)
-            how_close_beta_from_0 = (1/(float(abs(beta_data[ticker]["Beta"]).__round__(2)) - 0)) / (1/(proxy_beta))
-        
-        how_high_momentum = momentum_data[ticker]['Momentum_Factor'] / max(momentum_numbers)
-        how_invested = (1/investment_data[ticker]["Investment_Factor_AbsVal"]) / (1/min(investment_numbers))
-        
-        ticker_score = ((1/5)*(how_profitable + how_undervalued + how_low_beta + how_high_momentum + how_invested)).round(decimals = 3)
+        if max_profit and min_profit:
+
+            how_profitable = ticker_profit_factor / max_profit_factor
+
+        elif max_profit and min_profit == False :
+
+            if ticker_profit_factor >= 0 :
+
+                how_profitable = ticker_profit_factor / max_profit_factor
+
+            else:
+
+                how_profitable = - (ticker_profit_factor / min_profit_factor)
+
+        else: #max_profit == False and min_profit == False, max_profit == False and min_profit == True doesn't exist
+
+            how_profitable = - (ticker_profit_factor / min_profit_factor)
+
+        #VALUE_FACTOR MEASUREMENTS~
+
+        max_value_factor = max(mean_value_adjusted_to_zero)
+        min_value_factor = min(mean_value_adjusted_to_zero)
+        max_value = max_value_factor > 0
+        min_value = min_value_factor > 0
+        idx_ticker_possible_tickers = possible_tickers.index(ticker)
+        ticker_value_adjust_factor = mean_value_adjusted_to_zero[idx_ticker_possible_tickers]
+
+        if max_value and min_value == False :
+
+            if ticker_value_adjust_factor >= 0 :
+
+                how_undervalued = - (ticker_value_adjust_factor / max_value_factor) #HIGHER VALUATIONS MEAN SUBTRACTION IN FINAL WEIGHT
+
+            else:
+
+                how_undervalued = ticker_value_adjust_factor / min_value_factor #LOWER VALUATION HAVE MORE WEIGHT IN FINAL SCORE
+
+        #BETA_FACTOR MEASUREMENTS
+
+        max_beta_factor = max(beta_diff_adjusted_zero_mean)
+        min_beta_factor = min(beta_diff_adjusted_zero_mean)
+        max_beta = max_beta_factor > 0
+        min_beta = min_beta_factor > 0
+        idx_ticker_possible_tickers = possible_tickers.index(ticker)
+        ticker_beta_diff_factor = beta_diff_adjusted_zero_mean[idx_ticker_possible_tickers]
+
+
+        if max_beta and min_beta:
+
+            how_low_abs_beta =  - (ticker_beta_diff_factor / max_beta_factor) #BETA FURTHER FROM ZERO
+
+        elif max_beta and min_beta == False :
+
+            if ticker_beta_diff_factor >= 0 :
+
+                how_low_abs_beta = - (ticker_beta_diff_factor / max_beta_factor) #BETA FURTHER FROM ZERO
+
+            else:
+
+                how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+
+        else: #max_profit == False and min_profit == False, max_profit == False and min_profit == True doesn't exist
+
+            how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+
+        #MOMENTUM_FACTOR MEASUREMENTS
+
+        max_momentum_factor = max(momentum_numbers)
+        min_momentum_factor = min(momentum_numbers)
+        max_mom = max_momentum_factor > 0
+        min_mom = min_momentum_factor > 0
+
+        if max_mom and min_mom:
+
+            how_healthy_momentum = ticker_momentum_factor / max_momentum_factor
+
+        elif max_mom and min_mom == False :
+
+            if ticker_momentum_factor >= 0 :
+
+                how_healthy_momentum = ticker_momentum_factor / max_momentum_factor
+
+            else:
+
+                how_healthy_momentum = - (ticker_momentum_factor / min_momentum_factor)
+
+        else: #max_mom == False and min_mom == False, max_mom == False and min_mom == True doesn't exist
+
+            how_healthy_momentum = - (ticker_momentum_factor / min_momentum_factor)
+
+
+        #INVESTMENT_FACTOR MEASUREMENTS, ASSUMES TOTAL ASSETS ARE NEVER NEGATIVE
+
+        max_investment_factor = max(investment_numbers)
+        min_investment_factor = min(investment_numbers)
+        max_inv = max_investment_factor > 0
+        min_inv = min_investment_factor > 0
+
+        if max_inv and min_inv:
+
+            how_invested = - (ticker_investment_factor / max_investment_factor)
+
+        elif max_inv and min_inv == False :
+
+            if ticker_investment_factor >= 0 :
+
+                how_invested = - (ticker_investment_factor / max_investment_factor)
+
+            else:
+
+                how_invested = ticker_investment_factor / min_investment_factor
+
+        else: #max_mom == False and min_mom == False, max_mom == False and min_mom == True doesn't exist
+
+            how_invested = ticker_investment_factor / min_investment_factor
+
+        ticker_score = ((1/5)*(how_profitable + how_undervalued + how_low_abs_beta + how_healthy_momentum + how_invested)).round(decimals = 3)
         #SINCE LOWER VALUE,BETA AND INVESTMENT IS BETTER, ONE TURNS THEM POSITIVE BY PUTTING MINUS
-        dict_final_score[ticker] = ticker_score
-    
+        dict_final_score[ticker] = ticker_score * 100
+
     dict_copy = dict_final_score.copy()
     dict_final_score_ordered = {}
 
@@ -820,7 +1093,7 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
         ticker_max = list_keys[idx_max_score]
         dict_final_score_ordered[ticker_max] = max_score
         del dict_copy[ticker_max]
-    
+
     dict_final_score = dict_final_score_ordered
 
     return [dict_final_score,possible_tickers,unusable_tickers]
@@ -846,7 +1119,7 @@ def yield_ticker_metrics(possible_tickers:list,profit_data:dict,value_data:dict,
         all_tickers_metrics[ticker][f"Gross_FixAsset_Inc_{years_used_in_investment_factor_avg}y_AVG_AbsVal"] = investment_data[ticker][f"Gross_FixAsset_Inc_{years_used_in_investment_factor_avg}y_AVG_AbsVal"]
         all_tickers_metrics[ticker]['Momentum_Factor'] = momentum_data[ticker]['Momentum_Factor']
         all_tickers_metrics[ticker]['Beta'] = beta_data[ticker]['Beta']
-    
+
     return all_tickers_metrics
 
 
@@ -866,7 +1139,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
         print("WRONG INPUT, RE-INSERT AN INPUT")
         value_beta_momentum = str(input(f"WHAT FACTOR ARE YOU SEEKING {values_needed_to_fetch_outside[0]},{values_needed_to_fetch_outside[1]} OR {values_needed_to_fetch_outside[2]} (ANSWER EITHER ONE OF THE FACTORS): "))
         value_beta_momentum = value_beta_momentum.upper()
-    
+
     if value_beta_momentum == "VALUE":
 
         name = "value_factor"
@@ -892,12 +1165,12 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
 
                 print('INVALID ANSWER, REPEAT THE ANSWER')
                 refetch_or_not = input(f"DO YOU WANT TO REFETCH DATA FOR {value_beta_momentum}, IT TAKES LONG IF LENGTH OF TICKERS LIST IS HIGH AS ALL TICKERS IN THE LIST ARE REVISITED AND FETCH (ANSWER 'Yes' OR 'No'): ")
-            
+
             if refetch_or_not.upper() == 'YES':
 
                 dict_value_factor = ticker_value_factor(tickers_lst)
                 keys_chosen_tickers = dict_value_factor.keys()
-                
+
                 #TAKE OUT THE STORED FILE AND CHECK OUT IF THE TICKER IS THERE, AND IF NOT PUT IT THERE, OTHERWISE JUST UPDATE
 
                 df_value_factor = pd.read_csv(rf"{directory_to_park_or_get_from_storage}/{name}.csv")
@@ -913,17 +1186,17 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
                         dict_similar_to_the_funct[ticker][key] = dict_value[key][ticker]
 
                 for key in keys_chosen_tickers:
-                        
+
                     dict_similar_to_the_funct[key] = dict_value_factor[key]
-                
+
                 dict_value = dict_similar_to_the_funct
-                
+
                 #RE-STORE IT UNDER THE SAME DIRECTORY
                 df_value_factor = pd.DataFrame(dict_value.values(),dict_value.keys())
                 df_value_factor \
                  .to_csv(directory_to_park_or_get_from_storage / f"{name}.csv")
                 return dict_value_factor
-            
+
             else: #NO
 
                 df_value_factor = pd.read_csv(rf"{directory_to_park_or_get_from_storage}/{name}.csv")
@@ -973,12 +1246,12 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
 
                 print('INVALID ANSWER, REPEAT THE ANSWER')
                 refetch_or_not = input(f"DO YOU WANT TO REFETCH DATA FOR {value_beta_momentum}, IT TAKES LONG IF LENGTH OF TICKERS LIST IS HIGH AS ALL TICKERS IN THE LIST ARE REVISITED AND FETCH (ANSWER 'Yes' OR 'No'): ")
-            
+
             if refetch_or_not.upper() == 'YES':
 
                 dict_market_factor = ticker_beta(tickers_lst)
                 keys_chosen_tickers = dict_market_factor.keys()
-                
+
                 #TAKE OUT THE STORED FILE AND CHECK OUT IF THE TICKER IS THERE, AND IF NOT PUT IT THERE, OTHERWISE JUST UPDATE
                 df_market_factor = pd.read_csv(rf"{directory_to_park_or_get_from_storage}/{name}.csv")
                 df_market_factor = pd.DataFrame(data=list(df_market_factor['Beta']),index=list(df_market_factor['Unnamed: 0']))
@@ -992,7 +1265,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
                     dict_similar_to_the_funct[ticker]['Beta'] = dict_beta[ticker]
 
                 for key in keys_chosen_tickers:
-                        
+
                     dict_similar_to_the_funct[key] = dict_market_factor[key]
 
                 dict_beta = dict_similar_to_the_funct
@@ -1002,7 +1275,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
                 df_market_factor \
                 .to_csv(directory_to_park_or_get_from_storage / f"{name}.csv")
                 return dict_market_factor
-            
+
             else: #NO
 
                 df_market_factor = pd.read_csv(rf"{directory_to_park_or_get_from_storage}/{name}.csv")
@@ -1053,7 +1326,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
 
                 print('INVALID ANSWER, REPEAT THE ANSWER')
                 refetch_or_not = input(f"DO YOU WANT TO REFETCH DATA FOR {value_beta_momentum}, IT TAKES LONG IF LENGTH OF TICKERS LIST IS HIGH AS ALL TICKERS IN THE LIST ARE REVISITED AND FETCH (ANSWER 'Yes' OR 'No'): ")
-            
+
             if refetch_or_not.upper() == 'YES':
 
                 dict_momentum_factor = ticker_momentum(tickers_lst)
@@ -1072,9 +1345,9 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
                     dict_similar_to_the_funct[ticker]['Momentum_Factor'] = dict_momentum[ticker]
 
                 for key in keys_chosen_tickers:
-                        
+
                     dict_similar_to_the_funct[key] = dict_momentum_factor[key]
-                
+
                 dict_momentum = dict_similar_to_the_funct
 
                 #RE-STORE IT UNDER THE SAME DIRECTORY
@@ -1082,7 +1355,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
                 df_momentum_factor \
                 .to_csv(directory_to_park_or_get_from_storage / f"{name}.csv")
                 return dict_momentum_factor
-            
+
             else: #NO
 
                 df_momentum_factor = pd.read_csv(rf"{directory_to_park_or_get_from_storage}/{name}.csv")

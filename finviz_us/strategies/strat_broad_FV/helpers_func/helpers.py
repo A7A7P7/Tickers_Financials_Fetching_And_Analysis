@@ -14,18 +14,18 @@ def order_dict_asc_des(dic:dict,order = 'des'):
     if order == 'asc':
 
         dic = dict(sorted(dic.items(), key=lambda item: item[0])) #ascending
-    
+
     else:
 
         dic = dict(sorted(dic.items(), key=lambda item: item[1], reverse=True)) #descending
-    
+
     return dic
 
 #%%
 
 """FUNCTIONS USED TO GET METRICS FOR ANALYSIS"""
 
-def historical_metric(df_with_metric:pd.DataFrame,**kwargs): 
+def historical_metric(df_with_metric:pd.DataFrame,**kwargs):
 
     #KWARGS WILL BE THE STRs WITH THE NAMES OF THE METRICS
 
@@ -38,7 +38,7 @@ def historical_metric(df_with_metric:pd.DataFrame,**kwargs):
 
             fyear = df_with_metric.columns[fy]
             dict_metric[kwarg][fyear] = df_with_metric.at[kwarg,fyear]
-    
+
     return dict_metric
 
 def combine_dfs_from_dicts(**kwargs):
@@ -53,15 +53,15 @@ def combine_dfs_from_dicts(**kwargs):
         lst_index = []
         for index in df.index:
             lst_index.append(index)
-        
+
         len_list.append(len(lst_index))
         lst_with_lst_of_index.append(lst_index)
-    
+
     ind_small_list = len_list.index(min(len_list))
     small_list = lst_with_lst_of_index[ind_small_list]
 
     for i in range(min(len_list)):
-        
+
         index_small_list = small_list[i]
 
         count_belong = 0
@@ -71,16 +71,16 @@ def combine_dfs_from_dicts(**kwargs):
             if index_small_list in lst:
 
                 count_belong += 1
-        
+
         if count_belong == len(lst_with_lst_of_index):
 
             final_lst.append(index_small_list)
-    
+
     lst_dfs = []
     for df in kwargs.values():
 
         lst_dfs.append(df.loc[final_lst,:])
-    
+
     return pd.concat(lst_dfs,axis=1)
 
 def get_metrics_for_analysis(tickers_lst,dict_bs,dict_inc_stat):
@@ -108,7 +108,7 @@ def get_metrics_for_analysis(tickers_lst,dict_bs,dict_inc_stat):
 
             unusable_tickers.append(ticker)
             print(ticker,"IS UNUSABLE, BECAUSE REPORTING DATES CHANGED")
-        
+
         else:
 
             df_variables = combine_dfs_from_dicts(df1 = ticker_df_inc_stat, df2 = ticker_df_bs)
@@ -150,7 +150,7 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
         df = dict_df_metrics_organized[ticker]
         n_years = len(df) - 1
         df_index = df.index
-        
+
         #IF INDEX ARE NOT CONSECUTIVE, DROP THE TICKERS, HAVE JUMPS IN THE YEARS:
         years_consecutive = []
         first_year = int(df.index[0].replace('FY',''))
@@ -159,13 +159,16 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
             year = first_year + i
             year_to_str = str(year) + str('FY')
             years_consecutive.append(year_to_str)
-        
+
         lst_true = list(years_consecutive == df_index)
 
         if lst_true.count(True) == len(df_index):
 
             current_price = dict_price[ticker]
             last_eps = df.at[df_index[n_years],"EPS (Diluted)"]
+            list_eps = list(df["EPS (Diluted)"])
+            last_three_years_eps_avg = sum(list_eps[-3:]) / 3
+
 
             eps_cagr = ((df.at[df_index[n_years],"EPS (Diluted)"] / df.at[df_index[0],"EPS (Diluted)"]) ** (1/n_years)) - 1
             rev_cagr = ((df.at[df_index[n_years],"Total Revenue"] / df.at[df_index[0],"Total Revenue"]) ** (1/n_years)) - 1
@@ -186,7 +189,7 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
                 eps_year = df.at[df_index[year],"EPS (Diluted)"]
                 if eps_year > 0:
                     n_years_positive_eps += 1
-                
+
                 if year >= len(df)-3:
 
                     sht_debt_year = df.at[df_index[year],"Short Term Debt Incl. Current Port. of LT Debt"]
@@ -203,9 +206,9 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
             cond_op_margin = op_margin_cagr > 0
             cond_years_public = n_years > 5
             last_eps_positive = last_eps > 0
-            
+
             combined_conds = cond_eps_cagr and last_eps_positive and cond_rev_cagr and cond_sh_out and cond_op_margin and past_years_debt_coverage_approval and all_years_debt_coverage_approval and cond_years_public
-            
+
             if combined_conds:
 
                 if n_years_positive_eps < n_years:
@@ -230,6 +233,14 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
                 base_case_terminal_pe = min(pe_average_period,pe_past_3_values)
                 best_case_terminal_pe = max(pe_average_period,pe_past_3_values)
 
+                #INSTEAD OF last_eps YOU CAN TRY last_three_years_eps_avg
+
+                """
+                worst_case_share_p = last_three_years_eps_avg * ((1+worst_case_cagr) / (1+discount_rate))**n_years_forward * worst_case_terminal_pe
+                base_case_share_p = last_three_years_eps_avg * ((1+base_case_cagr) / (1+discount_rate))**n_years_forward * base_case_terminal_pe
+                best_case_share_p = last_three_years_eps_avg * ((1+best_case_cagr) / (1+discount_rate))**n_years_forward * best_case_terminal_pe
+                """
+
                 worst_case_share_p = last_eps * ((1+worst_case_cagr) / (1+discount_rate))**n_years_forward * worst_case_terminal_pe
                 base_case_share_p = last_eps * ((1+base_case_cagr) / (1+discount_rate))**n_years_forward * base_case_terminal_pe
                 best_case_share_p = last_eps * ((1+best_case_cagr) / (1+discount_rate))**n_years_forward * best_case_terminal_pe
@@ -244,7 +255,7 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
                 valuation_dict[ticker]['Fair_Value_Price'] = fv_share_p.round(decimals=3)
                 valuation_dict[ticker]['Current_Price'] = current_price
                 valuation_dict[ticker]['Under(+)/Over(-)_Valuation'] = f"{(price_factor-1)*100}% Undervalued" if price_factor > 1 else f"{(price_factor-1)*100}% Overvalued"
-        
+
         else:
 
             unusable_tickers.append(ticker)
@@ -279,7 +290,7 @@ def get_tickers_market_prices(tickers_lst:list):
         dict_price[ticker] = float(fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Price'])
         print("PRICE OFF",ticker,dict_price[ticker])
         time.sleep(0.3)
-    
+
     return dict_price
 
 """GET MARKET PRICES FROM STORED TICKERS"""
@@ -304,7 +315,7 @@ def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored
 
         print("INVALID INPUT,CHOOSE USE 'Yes' OR 'No'")
         stored_prices_exist = input("IS THERE ANY CSV WITH STORAGE OF THE PRICES (ANSWER 'Yes' OR 'No'): ")
-    
+
     if stored_prices_exist.upper() == "YES":
 
         refetch_or_stored = input("DO YOU WANT TO RE-FETCH THE PRICES OF THE TICKERS IN YOUR LIST, MIND IF LIST IS TO LONG IT WILL TAKE LONGER (ANSWER 'Yes' OR 'No'): ")
@@ -331,7 +342,7 @@ def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored
                 .to_csv(rf"{directory_where_prices_are_stored}\{name}.csv")
 
             return dict_price
-        
+
         else: #refetch_or_stored.upper() == "NO"
 
             #IMPORT CSV STORED
@@ -342,8 +353,15 @@ def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored
 
             for ticker in tickers_lst:
 
-                dict_price[ticker] = stored_dict_price[ticker]
-            
+                if ticker not in stored_dict_price.keys():
+
+                    dict_price[ticker] = float(fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Price'])
+                    time.sleep(0.3)
+
+                else:
+
+                    dict_price[ticker] = stored_dict_price[ticker]
+
             return dict_price
 
     else: #stored_prices_exist.upper() == "NO"
@@ -370,14 +388,16 @@ def filter_by_min_mkcap(tickers_lst:list,dict_tickers_inc_stat:dict):
     minimum_mkcap = float(input('Minimum MkCap to consider companies: '))
 
     for ticker in tickers_lst:
-    
+
         #GET MARKET CAP
         ticker_inc_stat_df = dict_tickers_inc_stat[ticker].copy()
         ticker_inc_stat_df = ticker_inc_stat_df.replace(",","",regex=True)
         recent_mk_cap = pd.to_numeric(ticker_inc_stat_df.loc['Market Capitalization',ticker_inc_stat_df.columns[1]])
 
         if recent_mk_cap > minimum_mkcap :
-        
+
             updated_ticker_list.append(ticker)
 
     return updated_ticker_list
+
+

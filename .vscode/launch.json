@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "env" : {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  "configurations": [
+    {
+      "name": "▶ Run Streamlit Dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "streamlit",
+      "args": ["run", "app.py"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "▶ Run Fama-French strategy (US)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/finviz_us/strategies/strat_basic_fama_french/basic_fam_fre.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "▶ Run Fair Value strategy (US)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/finviz_us/strategies/strat_broad_FV/strat_run.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "▶ Run strategies_run.py",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "finviz_us.strategies_run",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}
+
+

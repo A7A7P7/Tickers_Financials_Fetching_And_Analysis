@@ -1,6 +1,16 @@
 #%%
-from finviz_us.data_tickers_and_strats.organize_tickers import organizing_tickers
-from finviz_us.data_tickers_and_strats.strat_broad_FV.helpers_func import helpers
+from finviz_us.organize_tickers import organizing_tickers
+#%%
+from finviz_us.strategies.strat_broad_FV.helpers_func import helpers
+
+#%%
+
+import sys
+print(sys.path)
+
+import os
+print(os.getcwd())
+
 #%%
 
 directory_for_storage = organizing_tickers.directory_for_storage_or_retrieval

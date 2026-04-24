@@ -7,6 +7,7 @@
 
 from finviz_us.data_tickers_and_strats.organize_tickers import organizing_tickers
 from finviz_us.data_tickers_and_strats.miscellaneous.help_func import help_func
+from finviz_us.strategies import miscellaneous
 
 #%%
 
@@ -40,3 +41,10 @@ tickers_price_fcf_ratio
 tickers_shareholder_yield = help_func.shareholder_yield(tickers_lst,dict_all_tickers_all_financials['inc_stat'],dict_all_tickers_all_financials['stat_cfs'])
 
 tickers_shareholder_yield
+
+
+#%%
+
+file = from miscellaneous.help_func import help_func
+
+

@@ -6,6 +6,7 @@ import finvizfinance.quote as fvf
 from finvizfinance.screener.overview import Overview
 from pathlib import Path
 import time
+import os
 
 #%%
 
@@ -40,7 +41,7 @@ def choosing_tickers(directory_for_storage_or_retrieval):
 
                 ticker = file.stem
                 tickers_lst.append(ticker)
-        
+
         else: #all_tickers_or_some.upper() == "NO"
 
             n_tickers = int(input("HOW MANY TICKERS DO YOU WANT TO RETRIEVE: "))
@@ -58,7 +59,7 @@ def choosing_tickers(directory_for_storage_or_retrieval):
 
             print("WRONG INPUT, PROCESS WILL BE REPEATED")
             personal_list_answer = str(input("DO YOU WANT TO DO YOUR OWN LIST OR YOU WANT TO BE ASKED IF YOU WANT TICKERS FROM US INDEXES (ANSWER 'Yes' OR 'No'):"))
-        
+
         if personal_list_answer.upper() == "YES":
 
             n_tickers = int(input("HOW MANY TICKERS YOU WANT IN YOUR LIST: "))
@@ -96,15 +97,15 @@ def choosing_tickers(directory_for_storage_or_retrieval):
                     lst_tickers = list(df['Ticker'])
 
                     indexes_list_with_separate_list_of_indexes.append(lst_tickers)
-            
+
             for index in indexes_list_with_separate_list_of_indexes:
 
                 for ticker in index:
 
                     if ticker not in tickers_lst:
 
-                        tickers_lst.append(ticker) 
-            
+                        tickers_lst.append(ticker)
+
     return tickers_lst
 
 def getting_tickers_from_index(possibilities_list=list):
@@ -114,14 +115,14 @@ def getting_tickers_from_index(possibilities_list=list):
     ind_choosen = int(input('Number of the Index choose to get tickers: '))
 
     while ind_choosen < 0 or ind_choosen > 4:
-    
+
         print('WRONG INPUT, IT NEEDS TO BE AN INTEGER WITHIN THE INTERVAL [0,4]')
         ind_choosen = int(input('Number of the Index choose to get tickers: '))
-    
+
     message_confirming = str(input(f"'{possibilities_list[ind_choosen]}' was choosen to get tickers, answer 'Yes' to continue or 'No' to change"))
 
     if message_confirming == "Yes" or message_confirming == "No":
-        
+
         if message_confirming == "Yes":
 
             foverview = Overview()
@@ -138,11 +139,11 @@ def getting_tickers_from_index(possibilities_list=list):
 
 
         else:
-        
+
             ind_choosen = int(input('Number of the Index choose to get tickers: '))
 
             while ind_choosen < 0 or ind_choosen > 4:
-            
+
                 print('WRONG INPUT, IT NEEDS TO BE AN INTEGER WITHIN THE INTERVAL [0,4]')
                 ind_choosen = int(input('Number of the Index choose to get tickers: '))
 
@@ -157,15 +158,15 @@ def getting_tickers_from_index(possibilities_list=list):
             lst_tickers = list(df['Ticker'])
 
             return lst_tickers
-            
-        
+
+
     else:
-        
+
         print("WRONG ANSWER, USE EITHER 'Yes' OR 'No' EXACTLY LIKE WHAT IS IN THE PARENTHESIS.")
         message_confirming = str(input(f"{possibilities_list[ind_choosen]} was choosen to get tickers, answer 'Yes' to continue or 'No' to change"))
 
         while message_confirming != 'Yes' and message_confirming != 'No':
-        
+
             print("WRONG ANSWER, USE EITHER 'Yes' OR 'No' EXACTLY LIKE WHAT IS IN THE PARENTHESIS.")
             message_confirming = str(input(f"{possibilities_list[ind_choosen]} was choosen to get tickers, answer 'Yes' to continue or 'No' to change"))
 
@@ -188,13 +189,13 @@ def combine_tickers_from_different_indexes(**index_lists):
     "kwargs are lists of tickers"
 
     for lst in index_lists.values():
-    
+
         for ticker in lst:
-        
+
             if ticker not in combined_lst:
-            
+
                 combined_lst.append(ticker)
-    
+
     return combined_lst
 
 #%%
@@ -206,11 +207,11 @@ def get_bs_hist(ticker:str,ann_or_quar:str):
     if ann_or_quar != "A" or ann_or_quar != "Q":
 
         while (ann_or_quar != "A" and ann_or_quar != "Q"):
-            
+
             print("WRONG INPUT USE 'A' FOR ANNUAL OR 'Q' FOR QUARTERLY AS INPUT")
 
             ann_or_quar = str(input("Annual - 'A' or Quarterly - 'Q'"))
-        
+
         df_bs = fvf.Statements().get_statements(ticker,'B',ann_or_quar)
 
         time.sleep(0.5)
@@ -220,7 +221,7 @@ def get_bs_hist(ticker:str,ann_or_quar:str):
         # df_2 = df_bs.set_axis(df_bs.iloc[0],axis=1).iloc[1:2]
 
         # df_final = pd.concat([df_2,df_1],axis=0)
-        
+
         # return df_final
 
         return df_bs
@@ -236,7 +237,7 @@ def get_bs_hist(ticker:str,ann_or_quar:str):
         # df_2 = df_bs.set_axis(df_bs.iloc[0],axis=1).iloc[1:2]
 
         # df_final = pd.concat([df_2,df_1],axis=0)
-        
+
         # return df_final
 
         return df_bs
@@ -260,11 +261,11 @@ def get_inc_stat_hist(ticker:str,ann_or_quar:str):
     if ann_or_quar != "A" or ann_or_quar != "Q":
 
         while (ann_or_quar != "A" and ann_or_quar != "Q"):
-            
+
             print("WRONG INPUT USE 'A' FOR ANNUAL OR 'Q' FOR QUARTERLY AS INPUT")
 
             ann_or_quar = str(input("Annual - 'A' or Quarterly - 'Q'"))
-        
+
         df_inc = fvf.Statements().get_statements(ticker,'I',ann_or_quar)
 
         # df_1 = df_inc.set_axis(df_inc.iloc[0],axis=1).iloc[3:].replace(',',"",regex=True).apply(pd.to_numeric, errors='coerce')
@@ -272,7 +273,7 @@ def get_inc_stat_hist(ticker:str,ann_or_quar:str):
         # df_2 = df_inc.set_axis(df_inc.iloc[0],axis=1).iloc[1:3]
 
         # df_final = pd.concat([df_2,df_1],axis=0)
-        
+
         # return df_final
 
         return df_inc
@@ -286,11 +287,11 @@ def get_inc_stat_hist(ticker:str,ann_or_quar:str):
         # # df_2 = df_inc.set_axis(df_inc.iloc[0],axis=1).iloc[1:3]
 
         # # df_final = pd.concat([df_2,df_1],axis=0)
-        
+
         # return df_final
 
         return df_inc
-    
+
 def get_dict_with_inc_stats(tickers_lst:list):
 
     dict_inc_stat = dict()
@@ -310,7 +311,7 @@ def get_stat_cfs_hist(ticker:str,ann_or_quar:str):
     if ann_or_quar != "A" or ann_or_quar != "Q":
 
         while (ann_or_quar != "A" and ann_or_quar != "Q"):
-            
+
             print("WRONG INPUT USE 'A' FOR ANNUAL OR 'Q' FOR QUARTERLY AS INPUT")
 
             ann_or_quar = str(input("Annual - 'A' or Quarterly - 'Q'"))
@@ -336,7 +337,7 @@ def get_stat_cfs_hist(ticker:str,ann_or_quar:str):
         # df_2 = df_inc.set_axis(df_inc.iloc[0],axis=1).iloc[1:3]
 
         # df_final = pd.concat([df_2,df_1],axis=0)
-        
+
         # return df_final
 
         return df_stat
@@ -385,9 +386,9 @@ def get_dict_all_tickers_with_statements(dict_three_statements:dict,tickers_lst:
             else: #'stat_cfs'
 
                 dict_three_statements["stat_cfs"][ticker] = get_stat_cfs_hist(ticker,'A')
-            
+
             time.sleep(0.3)
-    
+
     return dict_three_statements
 
 #%%
@@ -404,7 +405,7 @@ def parquet_to_df(path_to_parquet_files:str,ticker:str):
         else:
 
             continue
-    
+
     return pd.read_parquet(file)
 
 def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_three_financials_to_transform:dict,tickers_lst:list,path_for_folder):
@@ -432,12 +433,12 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
                         print(tickers_lst[n],key,"exists but it is update")
 
                         #VALUES EXIST BUT ARE UPDATED
-                        
+
                         #GET SAVED DF
-                        str_path = f"{path_for_folder}/{key}"
+                        str_path = rf"{path_for_folder}\{key}"
                         ticker_saved_financial = parquet_to_df(str_path,tickers_lst[n])
                         df_fetched = dict_three_financials_to_transform[key][tickers_lst[n]]
-                        columns_to_be_added = []
+
 
                         #IF NEW VALUES APPEAR, THE IDEA ISN'T TO LOSE THE OLDEST VALUE, SO ADD INTO THE DF THOSE VALUES
 
@@ -449,7 +450,7 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
                             if period not in recent_df_periods:
 
                                 recent_df_periods.append(period)
-                        
+
                         df_periods_not_in_recent_df = df_fetched
 
                         n_cols_added = len(recent_df_periods) - len(df_fetched)
@@ -461,27 +462,34 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
                             col_df = ticker_saved_financial[col_name].to_frame()
                             col_df.columns = [i]
                             df_periods_not_in_recent_df = pd.concat([df_periods_not_in_recent_df,col_df],axis=1)
-                        
+
                         df_to_be_stored = df_periods_not_in_recent_df
-                        
+
                         for file in specific_ticker_path.iterdir():
 
                             file.unlink()
-                        
-                        end_point = specific_ticker_path / rf"{tickers_lst[n]}.parquet"
 
-                        df_to_be_stored.to_parquet(end_point)
+                        end_point = specific_ticker_path / rf"{tickers_lst[n]}.parquet"
+                        temp_end_point = specific_ticker_path / rf"{tickers_lst[n]}.parquet.tmp"
+
+                        #THIS IS DONE TO AVOID FILE CORRUPTION IF SCRIPT IS STOPPED MIDTIME
+                        df_to_be_stored.to_parquet(temp_end_point, engine="pyarrow", index=False)
+
+                        os.replace(temp_end_point,end_point)
 
                     else:
 
                         print(tickers_lst[n],key,"is added to storage")
-                        
+
                         #THAT PATH IS CREATED WITH THE VALUES
                         specific_ticker_path.mkdir(exist_ok=True)
                         ticker_statement = dict_three_financials_to_transform[key][tickers_lst[n]]
                         end_point = specific_ticker_path / rf"{tickers_lst[n]}.parquet"
-                        ticker_statement.to_parquet(end_point) #ticker_statement.to_parquet(folder_path / f"{tickers_lst[n]}.parquet")
-                
+                        temp_end_point = specific_ticker_path / rf"{tickers_lst[n]}.parquet.tmp"
+                        #THIS IS DONE TO AVOID FILE CORRUPTION IF SCRIPT IS STOPPED MIDTIME
+                        ticker_statement.to_parquet(temp_end_point, engine="pyarrow", index=False)
+                        os.replace(temp_end_point,end_point)
+
                 else: #PATH DOESN'T EXIST
 
                     print(tickers_lst[n],key,"is being stored in a new directory")
@@ -490,7 +498,10 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
                     folder_path.mkdir(exist_ok=True) #CREATE THE PATH
                     ticker_statement = dict_three_financials_to_transform[key][tickers_lst[n]]
                     end_point = folder_path / rf"{tickers_lst[n]}.parquet"
-                    ticker_statement.to_parquet(end_point)
+                    temp_end_point = folder_path / rf"{tickers_lst[n]}.parquet.tmp"
+                    #THIS IS DONE TO AVOID FILE CORRUPTION IF SCRIPT IS STOPPED MIDTIME
+                    ticker_statement.to_parquet(temp_end_point, engine="pyarrow", index=False)
+                    os.replace(temp_end_point,end_point)
 
 def updated_parquet_to_df(path_to_financials:str,tickers_lst:list): #Path(r"C:\Users\Afons\Documentos\Investments\finviz_financials")
 
@@ -540,9 +551,9 @@ def updated_parquet_to_df(path_to_financials:str,tickers_lst:list): #Path(r"C:\U
                     df_final = pd.concat([df_2,df_1],axis=0)
 
                     dict_all_tickers_all_financials_updated[key][tickers_lst[n]] = df_final
-            
+
             else:
-            
+
                 print(f"{tickers_lst[n]} FINANCIALS WERE NOT FOUND")
 
     return dict_all_tickers_all_financials_updated
@@ -599,7 +610,7 @@ def fetch_update_or_get_from_directory(dict_three_statements:dict,tickers_lst:li
 
         print("WRONG INPUT, USE 'Yes' OR 'No'")
         first_time = str(input("IS IT YOUR 1ST TIME USING THE SCRIPT (ANSWER 'Yes' OR 'No'): "))
-    
+
     if first_time.upper() == "YES" :
 
         print("IT WILL TAKE LONG OF LEN OF TICKERS_LST IS HIGH")
@@ -608,7 +619,7 @@ def fetch_update_or_get_from_directory(dict_three_statements:dict,tickers_lst:li
         create_and_store_or_update_tickers_parquet_files_from_df_financials(all_tickers_financials,tickers_lst,directory_for_storage_or_retrieval)
         dict_ticker_financials = updated_parquet_to_df(directory_for_storage_or_retrieval,tickers_lst)
         return dict_ticker_financials
-    
+
     else: #first_time.upper() == "NO"
 
         want_update = str(input("DO YOU WANT TO RE-FETCH THE TICKERS IN YOUR LIST (IT WILL TAKE LONG IF LEN OF TICKERS_LST IS HIGH AS ALL TICKERS ARE UPDATED), ANSWER 'Yes' or 'No': "))
@@ -641,24 +652,24 @@ def statement_match(statement_1:pd.DataFrame,statement_2:pd.DataFrame):
     size_stat_1 = len(statement_1)
     size_stat_2 = len(statement_2)
     size_match = size_stat_1 == size_stat_2
-    stat_1_ind = statement_1.index 
+    stat_1_ind = statement_1.index
     stat_2_ind = statement_2.index
 
     if size_match:
-    
+
         lst_bool = list(stat_1_ind == stat_2_ind)
         content_match = lst_bool.count(True) == size_stat_1
 
         if content_match:
-        
+
             return True
-        
+
         else:
-        
+
             return False
-    
+
     else:
-    
+
         return False
 
 def assess_tickers_comparability(list_dict_three_statements:list): #checks if tickers can be comparable by having similar variables in inc_stat, bal_sheet & stat_cfs
@@ -681,7 +692,7 @@ def assess_tickers_comparability(list_dict_three_statements:list): #checks if ti
         ticker_added = False
 
         for comparison in range(size_dict_assessing):
-        
+
             comparable_statements = 0
 
             first_comparable_ticker = dict_assessing_tickers_comparability[lst_keys_dict_assessing[comparison]][0]
@@ -689,34 +700,34 @@ def assess_tickers_comparability(list_dict_three_statements:list): #checks if ti
             #COMPARE WITH EACH STATEMENT BY SIZE AND CONTENT
 
             for statement in list_dict_three_statements: #'statement' is a df of bs,inc_stat and stat_cfs
-            
+
                 boolean = statement_match(statement[first_comparable_ticker],statement[ticker])
 
                 if boolean:
-                
+
                     comparable_statements += 1
-                
+
             if comparable_statements == 3:
 
                 dict_assessing_tickers_comparability[lst_keys_dict_assessing[comparison]].append(ticker)
                 ticker_added = True
                 break
-            
+
             else:
-            
+
                 continue
-        
+
         if ticker_added: #ticker was added
-        
+
             continue
-        
+
         else:
-        
+
             #CREATION OF NEW COMPARABLES
             new_key = f"comparable_tickers_{size_dict_assessing+1}"
             dict_assessing_tickers_comparability[new_key] = list()
             dict_assessing_tickers_comparability[new_key].append(ticker)
-    
+
     return dict_assessing_tickers_comparability
 
 def get_comparables_by_industry(dict_comparables:dict):
@@ -739,13 +750,13 @@ def get_comparables_by_industry(dict_comparables:dict):
 
                 dict_industry_comparables[key][ticker_industry] = list()
                 dict_industry_comparables[key][ticker_industry].append(ticker)
-            
+
             else:
 
                 dict_industry_comparables[key][ticker_industry].append(ticker)
-    
+
     #RETURNS A DICT WITH SAME KEYS AS THE INPUT BUT WITHIN THOSE KEYS THE VALUES HAVE MORE KEYS DIVIDING EACH TICKER IN SAME SECTORS
-    
+
     return dict_industry_comparables
 
 def get_tickers_that_most_match(dict_comparables:dict):
@@ -754,12 +765,12 @@ def get_tickers_that_most_match(dict_comparables:dict):
     for key in dict_comparables:
 
         lst_sizes.append(len(dict_comparables[key]))
-    
+
     max_size = max(lst_sizes)
     idx_max_size = lst_sizes.index(max_size)
     key = list(dict_comparables.keys())[idx_max_size]
     lst_sizes = dict_comparables[key]
-    
+
     return lst_sizes
 
 #%%
