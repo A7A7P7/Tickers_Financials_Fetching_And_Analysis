@@ -245,6 +245,7 @@ On first run with ~1,800 tickers, expect **45 – 60 minutes**.
 ```
 Tickers_Financials/
 ├── app.py                              # Streamlit dashboard (friendly UI)
+├── run.py                              # Runs the strategies created
 ├── setup.ps1                           # Windows one-click setup
 ├── setup.sh                            # Unix one-click setup
 ├── requirements.txt                    # Python dependencies
@@ -257,12 +258,28 @@ Tickers_Financials/
 │   └── tasks.json                      # Predefined tasks
 │
 ├── finviz_us/                          # US screener (FinViz-based)
-│   ├── strategies_run.py               # Runs both strategies sequentially
-│   └── data_tickers_and_strats/
-│       ├── organize_tickers/           # Fetch + parquet storage
-│       ├── strat_basic_fama_french/    # 5-Factor model
-│       ├── strat_broad_FV/             # Fair Value by persistence
-│       └── miscellaneous/              # WIP extra strategies
+│   ├── helpers_file_root               # Folder with file with functions used in run.py
+│   │   ├──  helpers_root.py            # File with functions that will be used in run.py
+│   ├── organize_tickers/               # Folder with file responsible fetching and handling tickers info
+│   │   ├──  helpers_finviz/            # Contains the file with functions used at "organizing_tickers.py"
+│   │   │    ├──  helpers_func.py       # File with helper functions for data organization
+│   │   ├──  organizing_tickers.py      # Contains the file with functions used at "organizing_tickers.py"
+│   ├── strategies/                     # Contains all strategies
+│   │   ├── miscellaneous/              # Contains all the stuff that is unused but might be important
+│   │   │  ├──  help_func/              # Folder with file with helpers
+│   │   │  │ ├──  help_func.py          # File with helpers with ratios not used for now.
+│   │   │  ├── strat_to_build.py        # Nothing build yet.
+│   │   ├── strat_basic_fama_french/    # 5-Factor model related content
+│   │   │  ├──  fama_french_helpers/    # Folder with file with helpers for factor calculation
+│   │   │  │ ├──  ff_helpers.py         # File with five factor functions
+│   │   │  ├── basic_fam_fre.py         # File with strategy run on a cell basis. Able to see inputs step-by-step.
+│   │   │  ├── func_strat_run.py        # File with function created with the entire strategy
+│   │   ├── strat_broad_FV/             # Fair Value by persistence
+│   │   │  ├──  helpers_func/           # Folder with file with helpers for FV Calculation for tickers.
+│   │   │  │ ├──  helpers.py            # File with FV functions based on 3 statements.
+│   │   │  ├── func_strat_run.py        # File with function created with the entire strategy
+│   │   │  ├── strat_run.py             # File with strategy run on a cell basis. Able to see inputs step-by-step.
+│
 │
 └── yahoo_finance/                      # 🚧 European screener (WIP, non-working)
     └── yf_provisional.py

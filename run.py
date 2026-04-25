@@ -17,6 +17,7 @@ most_similar_tickers = organizing_tickers.most_similar_tickers
 #%%
 
 print("NEXT INPUTS THAT YOU WILL PROVIDE ARE FOR STRATEGY 'fama_french'")
+print("EVERY TIME THE SCRIPT ASK YOU ABOUT A DIRECTORY, YOU WILL ALWAYS PROVIDE THE SAME DIRECTORY")
 
 strat_fam_french = run_basic_fam_fre(most_similar_tickers,dict_all_tickers_all_financials)
 
@@ -37,9 +38,5 @@ strategies = {
 strategy_choosen = helpers_root.choose_strategy(strategies)
 
 #%%
-
-strategy_choosen['tickers_buy_rankings_no_standardized']['OXY']
-
-
 
 # %%
