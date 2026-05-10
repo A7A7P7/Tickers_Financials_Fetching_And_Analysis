@@ -154,8 +154,12 @@ def ticker_value_factor(tickers,dict_financials): #ALSO RATIOS, SO CURRENCY OF T
 
             else:
 
-                print("yfinance HAS PE RATIO FOR TICKER",ticker, "OF",pe)
+                print("yfinance HAS P/E RATIO FOR TICKER",ticker, "OF",pe)
                 dict_value[ticker]['P/E'] = float(pe).__round__(2)
+
+        else:
+
+            dict_value[ticker]['P/E'] = price_earnings
 
         if np.isnan(price_book):
 
@@ -170,10 +174,14 @@ def ticker_value_factor(tickers,dict_financials): #ALSO RATIOS, SO CURRENCY OF T
 
             else:
 
-                print("yfinance HAS PE RATIO FOR TICKER",ticker, "OF",pb)
+                print("yfinance HAS P/B RATIO FOR TICKER",ticker, "OF",pb)
                 dict_value[ticker]['P/B'] = float(pb).__round__(2)
 
-        if type(dict_value[ticker]['P/B']) != type(0.0) or type(dict_value[ticker]['P/E']) != type(0.0):
+        else:
+
+            dict_value[ticker]['P/B'] = price_book
+
+        if type(dict_value[ticker]['P/B']) != float or type(dict_value[ticker]['P/E']) != float:
 
             dict_value[ticker]['AVG_Value_Metrics'] = "Not Available, Either Current Equity or Earnings are Negative or No Values"
 
@@ -202,6 +210,7 @@ def ticker_beta(tickers): #BETA SO CURRENCY OF THE STOCK ALSO DOESN'T MAKE ANY D
         except KeyError:
 
             beta = f"{ticker} DOESN'T HAVE A BETA VALUE IN yfinance"
+            dict_beta[ticker]['Beta'] = beta
             print("yfinance DOESN'T HAVE THE BETA OF TICKER",ticker)
 
         else:
@@ -294,6 +303,7 @@ def ticker_momentum(dict_inc_stat_tickers:dict,tickers:list): #ONLY CONSIDERS PR
     dict_comparable_reporting = dates_of_reporting_comparable(dict_inc_stat_tickers,tickers)
     lst_different_comparables = [dict_comparable_reporting[key] for key in dict_comparable_reporting]
     dict_momentum = dict()
+    print(lst_different_comparables)
 
     for lst in lst_different_comparables:
 
@@ -301,24 +311,43 @@ def ticker_momentum(dict_inc_stat_tickers:dict,tickers:list): #ONLY CONSIDERS PR
         previous_month = current_month - 1 if current_month != 1 else 12
         year_for_date = datetime.date.today().year if current_month != 1 else datetime.date.today().year - 1
 
-
         end_date = datetime.date(year_for_date,previous_month,1)
         start_date = datetime.date(year_for_date-1,previous_month,1)
 
         #PRICING DOWNLOAD
-        comp_tickers_df = yf.download(tickers=lst,start=start_date,end=end_date,interval='1d')
-        com_tickers_df_idx = comp_tickers_df.index
+        try:
 
-        for ticker in lst:
+            comp_tickers_df = yf.download(tickers=lst,start=start_date,end=end_date,interval='1d')
 
-            past_year_performance = (comp_tickers_df.at[com_tickers_df_idx[len(comp_tickers_df)-1],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[0],("Close",ticker)])-1
-            day_of_last_idx = com_tickers_df_idx[len(comp_tickers_df)-1].day
-            idx_of_end_past_month = len(comp_tickers_df)-1 if day_of_last_idx >= 20 else len(comp_tickers_df)-2
-            idx_of_start_past_month = len(comp_tickers_df) - 19 if day_of_last_idx >= 20 else len(comp_tickers_df) - 20
+        except IndexError:
 
-            past_month_performance = (comp_tickers_df.at[com_tickers_df_idx[idx_of_end_past_month],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[idx_of_start_past_month],("Close",ticker)])-1
-            momentum_factor = ((1+past_year_performance)/(1+past_month_performance)) - 1
-            dict_momentum[ticker]['Momentum_Factor'] = momentum_factor
+            print(rf"THIS/THESE {lst} TICKERS DON'T HAVE PRICING HISTORY")
+            for ticker in lst:
+
+                dict_momentum[ticker] = dict()
+                dict_momentum[ticker]['Momentum_Factor'] = f"NON-EXISTENT,{ticker} DOESN'T HAVE PRICING HISTORY TO COMPUTE MOMENTUM"
+
+        else:
+
+            com_tickers_df_idx = comp_tickers_df.index
+
+            for ticker in lst:
+
+                dict_momentum[ticker] = dict()
+                past_year_performance = (comp_tickers_df.at[com_tickers_df_idx[len(comp_tickers_df)-1],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[0],("Close",ticker)])-1
+                day_of_last_idx = com_tickers_df_idx[len(comp_tickers_df)-1].day
+                idx_of_end_past_month = len(comp_tickers_df)-1 if day_of_last_idx >= 20 else len(comp_tickers_df)-2
+                idx_of_start_past_month = len(comp_tickers_df) - 19 if day_of_last_idx >= 20 else len(comp_tickers_df) - 20
+                past_month_performance = (comp_tickers_df.at[com_tickers_df_idx[idx_of_end_past_month],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[idx_of_start_past_month],("Close",ticker)])-1
+
+                if np.isnan(past_year_performance) or np.isnan(past_month_performance):
+
+                    dict_momentum[ticker]['Momentum_Factor'] = f"NON-EXISTENT,{ticker} DOESN'T HAVE PRICING HISTORY TO COMPUTE MOMENTUM"
+
+                else:
+
+                    momentum_factor = ((1+past_year_performance)/(1+past_month_performance)) - 1
+                    dict_momentum[ticker]['Momentum_Factor'] = momentum_factor
 
     return dict_momentum
 
@@ -349,10 +378,9 @@ def ticker_investment_factor(tickers,dict_financials): #ALSO CURRENCY OF THE STO
         ticker_stat_cfs = stat_cfs_dict[ticker].copy()
         ticker_stat_cfs = ticker_stat_cfs.replace(",","",regex=True)
         record_capex = pd.to_numeric(ticker_stat_cfs.loc['Capital Expenditures'][1:n_years_lookback_to_compute_average+1])
-        record_assets_from_acquistions = pd.to_numeric(ticker_stat_cfs.loc['Net Assets From Acquisitions'][1:n_years_lookback_to_compute_average+1])
+        record_assets_from_acquistions = pd.to_numeric(ticker_stat_cfs.loc['Net Assets from Acquisitions'][1:n_years_lookback_to_compute_average+1])
         record_assets_sales = pd.to_numeric(ticker_stat_cfs.loc['Sale of Fixed Assets and Businesses'][1:n_years_lookback_to_compute_average+1])
-
-        gross_fixed_asset_increase = (-(record_capex+record_assets_from_acquistions-record_assets_sales)).mean().round(decimals=3)
+        gross_fixed_asset_increase = (-(record_capex+record_assets_from_acquistions-record_assets_sales)).mean().__round__(3)
         dict_investment[ticker][f"Gross_FixAsset_Inc_{n_years_lookback_to_compute_average}y_AVG_AbsVal"] = gross_fixed_asset_increase
 
         #TOTAL ASSETS
@@ -808,11 +836,11 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
 
             else:
 
-                how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+                how_low_abs_beta = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
 
         else: #max_profit == False and min_profit == False, max_profit == False and min_profit == True doesn't exist
 
-            how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+            how_low_abs_beta = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
 
         #MOMENTUM_FACTOR MEASUREMENTS
 

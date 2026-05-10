@@ -75,3 +75,22 @@ strat_output = run_with_finviz_yf()
 #%%
 
 strat_output
+
+#%%
+
+from finviz_us.helpers_file_root import helpers_root
+from yahoo_finance.organize_tickers import organizing_tickers
+from yahoo_finance.strategies.strat_broad_FV.func_strat_run import run_broad_fv
+from yahoo_finance.strategies.strat_basic_fama_french.func_run_strat import run_basic_fam_fre
+
+directory_for_storage_retrieval = organizing_tickers.directory_for_storage_or_retrieval
+dict_all_tickers_all_financials = organizing_tickers.dict_all_financials_and_tickers
+most_similar_tickers = organizing_tickers.similar_tickers_lst
+
+
+
+# %%
+
+dict_all_tickers_all_financials['inc_stat']['EDP.LS']
+
+

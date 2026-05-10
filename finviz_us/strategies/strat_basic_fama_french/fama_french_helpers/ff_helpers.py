@@ -739,11 +739,11 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
 
             else:
 
-                how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+                how_low_abs_beta = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
 
         else: #max_profit == False and min_profit == False, max_profit == False and min_profit == True doesn't exist
 
-            how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+            how_low_abs_beta = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
 
         #MOMENTUM_FACTOR MEASUREMENTS
 

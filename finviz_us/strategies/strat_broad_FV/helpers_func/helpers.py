@@ -3,7 +3,7 @@
 import pandas as pd
 import numpy as np
 import time
-import finvizfinance.quote as fvf
+import yfinance as yf
 
 #%%
 
@@ -288,7 +288,10 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
 
 #%%
 
-"""GET MARKET PRICES FROM FINVIZ"""
+yf.Ticker("EDP.LS").info.keys()
+
+#%%
+"""GET MARKET PRICES FROM yfinance"""
 
 def get_tickers_market_prices(tickers_lst:list):
 
@@ -296,7 +299,7 @@ def get_tickers_market_prices(tickers_lst:list):
 
     for ticker in tickers_lst:
 
-        dict_price[ticker] = float(fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Price'])
+        dict_price[ticker] = float()
         print("PRICE OFF",ticker,dict_price[ticker])
         time.sleep(0.3)
 
