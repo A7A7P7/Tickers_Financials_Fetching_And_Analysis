@@ -1,0 +1,120 @@
+#%%
+
+import sys, os
+
+print(sys.path)
+print("Interpreter:", sys.executable)
+print(os.getcwd())
+print("PYTHONPATH:", os.environ.get("PYTHONPATH"))
+
+#%%
+
+from yahoo_finance.organize_tickers import organizing_tickers
+#%%
+from yahoo_finance.strategies.strat_basic_fama_french.fama_french_helpers import ff_helpers
+
+#REPX,SD,VITL,CL,CMRE,NOG,AMPY,CPRT,CALM,REI,RIG,VAL,EPM,OXY,ADBE
+
+#%%
+
+#DICT WITH ALL TICKERS ALL FINANCIALS
+dict_all_tickers_all_financials = organizing_tickers.dict_all_financials_and_tickers
+
+#TICKERS FOR USAGE
+most_similar_tickers = organizing_tickers.similar_tickers_lst
+
+
+#%%
+
+#PROFIT FACTOR
+list_profit_factor = ff_helpers.ticker_profitability_factor(most_similar_tickers,dict_all_tickers_all_financials)
+
+dict_profit = list_profit_factor[0]
+most_similar_tickers = list_profit_factor[1]
+unusable_tickers = list_profit_factor[2]
+
+#%%
+
+dict_profit
+
+#%%
+
+dict_value_factor = ff_helpers.first_fetch_or_storage_on_directory(most_similar_tickers,dict_all_tickers_all_financials['inc_stat'])
+
+#%%
+
+dict_value_factor
+
+#%%
+
+dict_beta_factor = ff_helpers.first_fetch_or_storage_on_directory(most_similar_tickers,dict_all_tickers_all_financials['inc_stat'])
+
+#%%
+
+dict_beta_factor
+
+#%%
+
+dict_momentum_factor = ff_helpers.first_fetch_or_storage_on_directory(most_similar_tickers,dict_all_tickers_all_financials['inc_stat'])
+
+#%%
+
+dict_momentum_factor
+
+#%%
+
+#INVESTMENT FACTOR
+dict_investment = ff_helpers.ticker_investment_factor(most_similar_tickers,dict_all_tickers_all_financials)
+
+#%%
+
+#CLASSIFICATION OF TICKERS ACCORDING TO A BASIC FAMA-FRENCH
+dict_buying_attractiveness = ff_helpers.standardized_raking_sector_buys(most_similar_tickers,dict_profit,dict_value_factor,dict_beta_factor,dict_momentum_factor,dict_investment)
+
+dict_scores = dict_buying_attractiveness[0]
+tickers_considered = dict_buying_attractiveness[1]
+
+#%%
+
+dict_scores
+
+#%%
+
+n_years_used_for_averages_in_profit_factor = int(input("NºYEARS USED FOR AVERAGES IN CALCULATION OF PROFIT FACTOR: "))
+n_years_used_for_averages_in_investment_factor = int(input("NºYEARS USED FOR AVERAGES IN CALCULATION OF INVESTMENT FACTOR: "))
+
+dict_tickers_main_metrics = ff_helpers.yield_ticker_metrics(tickers_considered,dict_profit,dict_value_factor,dict_beta_factor,dict_momentum_factor,dict_investment,dict_scores,n_years_used_for_averages_in_profit_factor,n_years_used_for_averages_in_investment_factor)
+
+
+#%%
+
+dict_buying_attractiveness_no_mom = ff_helpers.standardized_raking_sector_buys_no_momentum(most_similar_tickers,dict_profit,dict_value_factor,dict_beta_factor,dict_momentum_factor,dict_investment)
+
+dict_scores_no_mom = dict_buying_attractiveness_no_mom[0]
+tickers_considered_no_mom = dict_buying_attractiveness_no_mom[1]
+
+# %%
+dict_scores_no_mom
+
+#%%
+
+dict_buying_attractiveness_no_standard = ff_helpers.raking_sector_buys(most_similar_tickers,dict_profit,dict_value_factor,dict_beta_factor,dict_momentum_factor,dict_investment)
+
+dict_scores_no_standard = dict_buying_attractiveness_no_standard[0]
+tickers_considered_no_standard = dict_buying_attractiveness_no_standard[1]
+
+#%%
+
+dict_scores_no_standard
+
+#%%
+
+dict_buying_attractiveness_only_book = ff_helpers.raking_sector_buys_value_only_pricetobook(most_similar_tickers,dict_profit,dict_value_factor,dict_beta_factor,dict_momentum_factor,dict_investment)
+
+dict_scores_no_mom_only_pb = dict_buying_attractiveness_only_book[0]
+tickers_considered_no_mom_only_pb = dict_buying_attractiveness_only_book[1]
+
+# %%
+dict_scores_no_mom_only_pb
+
+#%%

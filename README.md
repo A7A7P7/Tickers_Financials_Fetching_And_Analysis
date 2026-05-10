@@ -1,5 +1,7 @@
 # 📈 Tickers Financials Fetching & Analysis
 
+# 🤖 README.md was built using AI in the vast majority. EVERYTHING RELATED TO Shell & PowerShell was built using AI.
+
 > Quantitative stock screener for US (and, eventually, European) equities —
 > scrapes 3 financial statements, stores them locally, and ranks tickers with
 > two peer-reviewed investing frameworks.
@@ -263,7 +265,7 @@ Tickers_Financials/
 │   ├── organize_tickers/               # Folder with file responsible fetching and handling tickers info
 │   │   ├──  helpers_finviz/            # Contains the file with functions used at "organizing_tickers.py"
 │   │   │    ├──  helpers_func.py       # File with helper functions for data organization
-│   │   ├──  organizing_tickers.py      # Contains the file with functions used at "organizing_tickers.py"
+│   │   ├──  organizing_tickers.py      # File which runs code from functions to fetch tickers' data
 │   ├── strategies/                     # Contains all strategies
 │   │   ├── miscellaneous/              # Contains all the stuff that is unused but might be important
 │   │   │  ├──  help_func/              # Folder with file with helpers
@@ -281,8 +283,31 @@ Tickers_Financials/
 │   │   │  ├── strat_run.py             # File with strategy run on a cell basis. Able to see inputs step-by-step.
 │
 │
-└── yahoo_finance/                      # 🚧 European screener (WIP, non-working)
-    └── yf_provisional.py
+|   🚧🚧🚧Yahoo Finance Script currently being built 🚧🚧🚧
+|
+|
+|── yahoo_finance/                      # Rest of the world screener (YahooFinance-based)
+│   ├── helpers_file_root               # Folder with file with functions used in run.py NOT CREATED YET
+│   │   ├──  helpers_root.py            # File with functions that will be used in run.py NOT CREATED YET
+│   ├── organize_tickers/               # Folder with file responsible fetching and handling tickers info
+│   │   ├──  helpers_org/               # Contains the file with functions used at "organizing_tickers.py"
+│   │   │    ├──  helpers.py            # File with helper functions for data organization of 'yfinance'
+│   │   ├──  organizing_tickers.py      # File which runs code from functions to fetch tickers' data
+│   ├── strategies/                     # Contains all strategies
+│   │   ├── miscellaneous/              # Contains all the stuff that is unused but might be important
+│   │   │  ├──  help_func/              # Folder with file with helpers
+│   │   │  │ ├──  help_func.py          # File with helpers with ratios not used for now.
+│   │   │  ├── strat_to_build.py        # Nothing build yet.
+│   │   ├── strat_basic_fama_french/    # 5-Factor model related content
+│   │   │  ├──  fama_french_helpers/    # Folder with file with helpers for factor calculation
+│   │   │  │ ├──  ff_helpers.py         # File with five factor functions
+│   │   │  ├── basic_fam_fre.py         # File with strategy run on a cell basis. Able to see inputs step-by-step.
+│   │   │  ├── func_strat_run.py        # File with function created with the entire strategy
+│   │   ├── strat_broad_FV/             # Fair Value by persistence
+│   │   │  ├──  helpers_func/           # Folder with file with helpers for FV Calculation for tickers.
+│   │   │  │ ├──  helpers.py            # File with FV functions based on 3 statements.
+│   │   │  ├── func_strat_run.py        # File with function created with the entire strategy
+│   │   │  ├── strat_run.py             # File with strategy run on a cell basis. Able to see inputs step-by-step.
 ```
 
 ---

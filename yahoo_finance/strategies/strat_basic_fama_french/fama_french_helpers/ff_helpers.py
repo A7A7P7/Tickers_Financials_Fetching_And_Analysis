@@ -2,10 +2,13 @@
 
 import pandas as pd
 import numpy as np
+import yfinance as yf
 import time
-import finvizfinance.quote as fvf
 from pathlib import Path
 import math
+import datetime
+
+#NEED TO ALTER THE MOMENTUM FACTOR BECAUSE YF DOESN'T HAVE PAST PERFORMANCE MONTH AND PAST YEAR YOU NEED TO FETCH IT
 
 #%%
 
@@ -40,9 +43,9 @@ def ticker_profitability_factor(tickers,dict_financials): #FACTOR CONSIDERS RATI
         #Needs Income Statement to get Revenues and Operating Income
     n_years_lookback_to_compute_average = int(input('NUMBER OF YEARS TO CONSIDER FOR AVERAGES: '))
 
-    while n_years_lookback_to_compute_average < 1 or n_years_lookback_to_compute_average > 8 :
+    while n_years_lookback_to_compute_average < 1 or n_years_lookback_to_compute_average > 4 :
 
-        print("NUMBER BETWEEN 1 AND 7")
+        print("NUMBER BETWEEN 1 AND 4")
         n_years_lookback_to_compute_average = int(input('NUMBER OF YEARS TO CONSIDER FOR AVERAGES: '))
 
     for ticker in possible_tickers:
@@ -122,39 +125,54 @@ def ticker_profitability_factor(tickers,dict_financials): #FACTOR CONSIDERS RATI
 
 """VALUE FACTOR"""
 
-def ticker_value_factor(tickers): #ALSO RATIOS, SO CURRENCY OF THE STOCK DOESN'T MAKE ANY DIFFERENCE
+def ticker_value_factor(tickers,dict_financials): #ALSO RATIOS, SO CURRENCY OF THE STOCK DOESN'T MAKE ANY DIFFERENCE
 
     dict_value = dict()
+    bal_sheet_dict = dict_financials['bal_sheet']
 
     for ticker in tickers:
 
         dict_value[ticker] = dict()
+        ticker_df = bal_sheet_dict[ticker]
+        ticker_df_columns = ticker_df.columns
+        price_earnings = ticker_df.at["Price To Earnings Ratio",ticker_df_columns[0]]
+        price_book = ticker_df.at["Price to Book Ratio",ticker_df_columns[0]]
 
-        #IMPORTS DIRECTLY FROM FINVIZ, SO DO TIME.SLEEP
-        price_earnings = fvf.finvizfinance(ticker).ticker_full_info()['fundament']['P/E']
-        time.sleep(0.3)
-        price_book = fvf.finvizfinance(ticker).ticker_full_info()['fundament']['P/B']
-        print(ticker,"P/E",price_earnings,"AND P/B",price_book)
+        if np.isnan(price_earnings):
 
-        if "-" in price_earnings:
+            try:
 
-            dict_value[ticker]['P/E'] = "No Earnings"
+                pe = yf.Ticker(ticker).info["trailingPE"]
 
-        else:
+            except KeyError:
 
-            dict_value[ticker]['P/E'] = float(price_earnings).__round__(2)
+                print("yfinance ALSO DOESN'T HAVE PE RATIO FOR TICKER",ticker)
+                dict_value[ticker]['P/E'] = "No Earnings"
 
-        if "-" in price_book:
+            else:
 
-            dict_value[ticker]['P/B'] = "Negative Equity"
+                print("yfinance HAS PE RATIO FOR TICKER",ticker, "OF",pe)
+                dict_value[ticker]['P/E'] = float(pe).__round__(2)
 
-        else:
+        if np.isnan(price_book):
 
-            dict_value[ticker]['P/B'] = float(price_book).__round__(2)
+            try:
+
+                pb = yf.Ticker(ticker).info["priceToBook"] #"CHECK ON THE INFO WHAT IS THE KEY FOR PB"
+
+            except KeyError:
+
+                print("yfinance ALSO DOESN'T HAVE PRICE TO BOOK RATIO FOR TICKER",ticker)
+                dict_value[ticker]['P/B'] = "No Value"
+
+            else:
+
+                print("yfinance HAS PE RATIO FOR TICKER",ticker, "OF",pb)
+                dict_value[ticker]['P/B'] = float(pb).__round__(2)
 
         if type(dict_value[ticker]['P/B']) != type(0.0) or type(dict_value[ticker]['P/E']) != type(0.0):
 
-            dict_value[ticker]['AVG_Value_Metrics'] = "Not Available, Either Current Equity or Earnings are Negative"
+            dict_value[ticker]['AVG_Value_Metrics'] = "Not Available, Either Current Equity or Earnings are Negative or No Values"
 
         else:
 
@@ -174,26 +192,19 @@ def ticker_beta(tickers): #BETA SO CURRENCY OF THE STOCK ALSO DOESN'T MAKE ANY D
 
         dict_beta[ticker] = dict()
 
-        #IMPORTS DIRECTLY FROM FINVIZ, SO DO TIME.SLEEP
-        beta = fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Beta']
+        try:
 
-        if "-" in beta:
+            beta = yf.Ticker(ticker).info["beta"]
 
-            if beta == "-":
+        except KeyError:
 
-                beta = f"{ticker} DOESN'T HAVE A BETA VALUE IN FINVIZ"
-
-            else:
-
-                beta = float(beta.replace("-","")) * (-1)
+            beta = f"{ticker} DOESN'T HAVE A BETA VALUE IN yfinance"
+            print("yfinance DOESN'T HAVE THE BETA OF TICKER",ticker)
 
         else:
 
-            beta = float(beta)
-
-        dict_beta[ticker]['Beta'] = beta
-        print("BETA OF",ticker,"IS",beta)
-        time.sleep(0.3)
+            dict_beta[ticker]['Beta'] = beta
+            print("BETA OF",ticker,"IS",beta)
 
     return dict_beta
 
@@ -201,55 +212,110 @@ def ticker_beta(tickers): #BETA SO CURRENCY OF THE STOCK ALSO DOESN'T MAKE ANY D
 
 """MOMENTUM FACTOR"""
 
-def ticker_momentum(tickers): #ONLY CONSIDERS PRICING PERFORMANCE, ALSO CURRENCY OF THE STOCK DOESN'T MAKE ANY DIFFERENCE, IT WILL BE A RATIO.
+#FUNCTION TO REDUCE THE DOWNLOADS NEEDED AND THE IMPORTS NEEDED
+def dates_of_reporting_comparable(dict_inc_stat_tickers:dict,new_tickers:list):
 
+    dict_comparable_reporting_dates = dict()
+
+    for ticker in new_tickers:
+
+        ticker_reporting_dates = dict_inc_stat_tickers[ticker].columns
+        n_cols_ticker = len(ticker_reporting_dates)
+        if len(dict_comparable_reporting_dates) == 0:
+
+            dict_comparable_reporting_dates["comp_report_dates_1"] = list()
+            dict_comparable_reporting_dates["comp_report_dates_1"].append(ticker)
+
+        else:
+
+            list_of_keys = list(dict_comparable_reporting_dates.keys())
+            number_of_dict_keys = len(list_of_keys)
+            keys_follow = 0
+
+            while keys_follow < number_of_dict_keys:
+
+                first_ticker_of_each_comparable = dict_comparable_reporting_dates[list_of_keys[keys_follow]][0]
+                cols_of_that_ticker = dict_inc_stat_tickers[first_ticker_of_each_comparable].columns
+                n_of_cols = len(cols_of_that_ticker)
+                min_cols = min(n_cols_ticker,n_of_cols)
+                if n_of_cols != n_cols_ticker:
+
+                    ticker_reporting_dates_update = dict_inc_stat_tickers[ticker].columns[0:min_cols]
+                    cols_of_that_ticker_update = dict_inc_stat_tickers[first_ticker_of_each_comparable].columns[0:min_cols]
+
+                else:
+
+                    ticker_reporting_dates_update = ticker_reporting_dates
+                    cols_of_that_ticker_update = cols_of_that_ticker
+
+                list_true_cols = list(ticker_reporting_dates_update == cols_of_that_ticker_update)
+                numb_of_equal_rep_dates = list_true_cols.count(True)
+
+                if min_cols == numb_of_equal_rep_dates:
+
+                    dict_comparable_reporting_dates[list_of_keys[keys_follow]].append(ticker)
+                    break
+
+                else:
+
+                    keys_follow += 1
+
+            if keys_follow == number_of_dict_keys:
+
+                dict_comparable_reporting_dates[f"comp_report_dates{keys_follow}"] = list()
+                dict_comparable_reporting_dates[f"comp_report_dates{keys_follow}"].append(ticker)
+
+    for key in dict_comparable_reporting_dates:
+
+        #ENSURE THE TICKER WITH HIGHEST NºCOLS IS AT BEGGINING, IMPORTANT FOR NEXT USAGE
+        n_cols_per_ticker = []
+
+        for ticker in dict_comparable_reporting_dates[key]:
+
+            n_cols_per_ticker.append(len(dict_inc_stat_tickers[ticker].columns))
+            max_cols = max(n_cols_per_ticker)
+            if len(dict_inc_stat_tickers[ticker].columns) == max_cols:
+
+                if len(n_cols_per_ticker) > 0:
+
+                    current_idx = len(n_cols_per_ticker) - 1
+                    ticker_in_beg = dict_comparable_reporting_dates[key][0]
+                    dict_comparable_reporting_dates[key][0] = ticker
+                    dict_comparable_reporting_dates[key][current_idx] = ticker_in_beg
+
+    return dict_comparable_reporting_dates
+
+def ticker_momentum(dict_inc_stat_tickers:dict,tickers:list): #ONLY CONSIDERS PRICING PERFORMANCE, ALSO CURRENCY OF THE STOCK DOESN'T MAKE ANY DIFFERENCE, IT WILL BE A RATIO.
+
+    #THE IDEA OF THE FUNCTION IS TO GET AN AVERAGE OF THE PRICES NEAR REPORTING TO CALCULATE RATIOS THAT NEED PRICES
+    dict_comparable_reporting = dates_of_reporting_comparable(dict_inc_stat_tickers,tickers)
+    lst_different_comparables = [dict_comparable_reporting[key] for key in dict_comparable_reporting]
     dict_momentum = dict()
 
-    for ticker in tickers:
+    for lst in lst_different_comparables:
 
-        dict_momentum[ticker] = dict()
-
-        #IMPORTS DIRECTLY FROM FINVIZ, SO DO TIME.SLEEP
-        past_month_performance = fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Perf Month'].replace("%","")
-        time.sleep(0.3)
-        past_year_performance = fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Perf Year'].replace("%","")
-
-        if "-" in past_month_performance: #IT COMES AS A STRING, SO TO TURN INTO FLOAT, ONE NEEDS TO REMOVE NON-NUMBER CHARACTERS
-
-            if past_month_performance == "-": #BASICALLY TICKERS THAT ARE RECENTLY IN THE STOCK MARKET AREN'T INCLUDED
-
-                dict_momentum[ticker]['Momentum_Factor'] = "NON-EXISTENT, TICKER DOESN'T HAVE PERFORMANCE OF PAST MONTH"
-
-            else:
-
-                past_month_performance = float(past_month_performance.replace("-","")) * (-1) / 100 #PUT IN %
-
-        else:
-
-            past_month_performance = float(past_month_performance) / 100 #PUT IN %
-
-        if "-" in past_year_performance: #IT COMES AS A STRING, SO TO TURN INTO FLOAT, ONE NEEDS TO REMOVE NON-NUMBER CHARACTERS
-
-            if past_year_performance == "-": #BASICALLY TICKERS THAT ARE RECENTLY IN THE STOCK MARKET AREN'T INCLUDED
-
-                dict_momentum[ticker]['Momentum_Factor'] = "NON-EXISTENT, TICKER DOESN'T HAVE PERFORMANCE OF PAST YEAR"
-
-            else:
-
-                past_year_performance = float(past_year_performance.replace("-","")) * (-1) / 100 #PUT IN %
-
-        else:
-
-            past_year_performance = float(past_year_performance) / 100 #PUT IN %
-
-        if type(past_month_performance) == float and type(past_year_performance) == float:
+        current_month = datetime.date.today().month
+        previous_month = current_month - 1 if current_month != 1 else 12
+        year_for_date = datetime.date.today().year if current_month != 1 else datetime.date.today().year - 1
 
 
+        end_date = datetime.date(year_for_date,previous_month,1)
+        start_date = datetime.date(year_for_date-1,previous_month,1)
+
+        #PRICING DOWNLOAD
+        comp_tickers_df = yf.download(tickers=lst,start=start_date,end=end_date,interval='1d')
+        com_tickers_df_idx = comp_tickers_df.index
+
+        for ticker in lst:
+
+            past_year_performance = (comp_tickers_df.at[com_tickers_df_idx[len(comp_tickers_df)-1],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[0],("Close",ticker)])-1
+            day_of_last_idx = com_tickers_df_idx[len(comp_tickers_df)-1].day
+            idx_of_end_past_month = len(comp_tickers_df)-1 if day_of_last_idx >= 20 else len(comp_tickers_df)-2
+            idx_of_start_past_month = len(comp_tickers_df) - 19 if day_of_last_idx >= 20 else len(comp_tickers_df) - 20
+
+            past_month_performance = (comp_tickers_df.at[com_tickers_df_idx[idx_of_end_past_month],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[idx_of_start_past_month],("Close",ticker)])-1
             momentum_factor = ((1+past_year_performance)/(1+past_month_performance)) - 1
             dict_momentum[ticker]['Momentum_Factor'] = momentum_factor
-
-        print(ticker,"MOMENTUM FACTOR: ",momentum_factor)
-        time.sleep(0.1)
 
     return dict_momentum
 
@@ -267,9 +333,9 @@ def ticker_investment_factor(tickers,dict_financials): #ALSO CURRENCY OF THE STO
         #Needs Income Statement to get Revenues and Operating Income
     n_years_lookback_to_compute_average = int(input('NUMBER OF YEARS TO CONSIDER FOR AVERAGES: '))
 
-    while n_years_lookback_to_compute_average < 1 or n_years_lookback_to_compute_average > 8 :
+    while n_years_lookback_to_compute_average < 1 or n_years_lookback_to_compute_average > 4 :
 
-        print("NUMBER BETWEEN 1 AND 7")
+        print("NUMBER BETWEEN 1 AND 3")
         n_years_lookback_to_compute_average = int(input('NUMBER OF YEARS TO CONSIDER FOR AVERAGES: '))
 
     for ticker in tickers:
@@ -1127,7 +1193,7 @@ def yield_ticker_metrics(possible_tickers:list,profit_data:dict,value_data:dict,
 
 """UPDATE OR RETRIEVE TICKERS FACTOR SUCH AS VALUE, BETA OR MOMENTUM"""
 
-def first_fetch_or_storage_on_directory(tickers_lst:list):
+def first_fetch_or_storage_on_directory(tickers_lst:list,dict_inc_stat_tickers:dict):
 
     directory_to_park_or_get_from_storage = Path(input("PROVIDE A DIRECTORY TO A/THE FOLDER WHERE STORAGE INTO CSV IS OR WILL OCCUR: ").strip().strip('"').strip("'"))
     values_needed_to_fetch_outside = ['Value','Beta','Momentum']
@@ -1312,7 +1378,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
 
         if fetch_refetch_storage.upper() == 'NO':
 
-            dict_momentum_factor = ticker_momentum(tickers_lst)
+            dict_momentum_factor = ticker_momentum(dict_inc_stat_tickers,tickers_lst)
             df_momentum_factor = pd.DataFrame(dict_momentum_factor.values(),dict_momentum_factor.keys())
             df_momentum_factor \
              .to_csv(directory_to_park_or_get_from_storage / f"{name}.csv")
@@ -1329,7 +1395,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list):
 
             if refetch_or_not.upper() == 'YES':
 
-                dict_momentum_factor = ticker_momentum(tickers_lst)
+                dict_momentum_factor = ticker_momentum(dict_inc_stat_tickers,tickers_lst)
                 keys_chosen_tickers = dict_momentum_factor.keys()
 
                 #TAKE OUT THE STORED FILE AND CHECK OUT IF THE TICKER IS THERE, AND IF NOT PUT IT THERE, OTHERWISE JUST UPDATE

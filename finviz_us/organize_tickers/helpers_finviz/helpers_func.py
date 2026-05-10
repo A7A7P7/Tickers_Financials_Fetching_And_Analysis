@@ -442,8 +442,8 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
 
                         #IF NEW VALUES APPEAR, THE IDEA ISN'T TO LOSE THE OLDEST VALUE, SO ADD INTO THE DF THOSE VALUES
 
-                        oldest_df_periods = list(ticker_saved_financial.loc['Period'])
-                        recent_df_periods = list(df_fetched.loc['Period'])
+                        oldest_df_periods = list(ticker_saved_financial.loc['Period End Date'])
+                        recent_df_periods = list(df_fetched.loc['Period End Date'])
 
                         for period in oldest_df_periods:
 
@@ -473,7 +473,7 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
                         temp_end_point = specific_ticker_path / rf"{tickers_lst[n]}.parquet.tmp"
 
                         #THIS IS DONE TO AVOID FILE CORRUPTION IF SCRIPT IS STOPPED MIDTIME
-                        df_to_be_stored.to_parquet(temp_end_point, engine="pyarrow", index=False)
+                        df_to_be_stored.to_parquet(temp_end_point, engine="pyarrow", index=True)
 
                         os.replace(temp_end_point,end_point)
 
@@ -487,7 +487,7 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
                         end_point = specific_ticker_path / rf"{tickers_lst[n]}.parquet"
                         temp_end_point = specific_ticker_path / rf"{tickers_lst[n]}.parquet.tmp"
                         #THIS IS DONE TO AVOID FILE CORRUPTION IF SCRIPT IS STOPPED MIDTIME
-                        ticker_statement.to_parquet(temp_end_point, engine="pyarrow", index=False)
+                        ticker_statement.to_parquet(temp_end_point, engine="pyarrow", index=True)
                         os.replace(temp_end_point,end_point)
 
                 else: #PATH DOESN'T EXIST
@@ -500,7 +500,7 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
                     end_point = folder_path / rf"{tickers_lst[n]}.parquet"
                     temp_end_point = folder_path / rf"{tickers_lst[n]}.parquet.tmp"
                     #THIS IS DONE TO AVOID FILE CORRUPTION IF SCRIPT IS STOPPED MIDTIME
-                    ticker_statement.to_parquet(temp_end_point, engine="pyarrow", index=False)
+                    ticker_statement.to_parquet(temp_end_point, engine="pyarrow", index=True)
                     os.replace(temp_end_point,end_point)
 
 def updated_parquet_to_df(path_to_financials:str,tickers_lst:list): #Path(r"C:\Users\Afons\Documentos\Investments\finviz_financials")
@@ -536,9 +536,11 @@ def updated_parquet_to_df(path_to_financials:str,tickers_lst:list): #Path(r"C:\U
 
                     df_1 = saved_df.set_axis(saved_df.iloc[0],axis=1).iloc[3:].replace(',',"",regex=True).apply(pd.to_numeric, errors='coerce')
 
-                    df_2 = saved_df.set_axis(saved_df.iloc[0],axis=1).iloc[1:3]
+                    df_2 = saved_df.set_axis(saved_df.iloc[0],axis=1).iloc[1:2]
 
-                    df_final = pd.concat([df_2,df_1],axis=0)
+                    df_3 = saved_df.set_axis(saved_df.iloc[0],axis=1).iloc[2:3]
+
+                    df_final = pd.concat([df_2,df_3,df_1],axis=0)
 
                     dict_all_tickers_all_financials_updated[key][tickers_lst[n]] = df_final
 
@@ -546,9 +548,11 @@ def updated_parquet_to_df(path_to_financials:str,tickers_lst:list): #Path(r"C:\U
 
                     df_1 = saved_df.set_axis(saved_df.iloc[0],axis=1).iloc[3:].replace(',',"",regex=True).apply(pd.to_numeric, errors='coerce')
 
-                    df_2 = saved_df.set_axis(saved_df.iloc[0],axis=1).iloc[1:3]
+                    df_2 = saved_df.set_axis(saved_df.iloc[0],axis=1).iloc[1:2]
 
-                    df_final = pd.concat([df_2,df_1],axis=0)
+                    df_3 = saved_df.set_axis(saved_df.iloc[0],axis=1).iloc[2:3]
+
+                    df_final = pd.concat([df_2,df_3,df_1],axis=0)
 
                     dict_all_tickers_all_financials_updated[key][tickers_lst[n]] = df_final
 

@@ -32,6 +32,24 @@
       "justMyCode": false
     },
     {
+      "name": "▶ Activate Statements",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/yahoo_finance/statements.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "▶ European Adjustments",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/yahoo_finance/yf_provisional.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
       "name": "▶ Run strategies_run.py",
       "type": "debugpy",
       "request": "launch",

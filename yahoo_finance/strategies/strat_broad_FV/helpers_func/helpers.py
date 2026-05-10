@@ -3,7 +3,8 @@
 import pandas as pd
 import numpy as np
 import time
-import finvizfinance.quote as fvf
+import datetime
+import yfinance as yf
 
 #%%
 
@@ -288,17 +289,20 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
 
 #%%
 
-"""GET MARKET PRICES FROM FINVIZ"""
+"""GET MARKET PRICES FROM yfinance"""
 
 def get_tickers_market_prices(tickers_lst:list):
 
     dict_price = dict()
 
+    end_date = datetime.date.today()
+    start_date = datetime.date.today() - pd.Timedelta(days=3)
+    tickers_price_df = yf.download(tickers=tickers_lst,start=start_date,end=end_date,interval='1d')
+
     for ticker in tickers_lst:
 
-        dict_price[ticker] = float(fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Price'])
+        dict_price[ticker] = tickers_price_df.at[len(tickers_price_df) - 1,('Close',ticker)]
         print("PRICE OFF",ticker,dict_price[ticker])
-        time.sleep(0.3)
 
     return dict_price
 
@@ -360,12 +364,15 @@ def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored
             #GET TICKERS_PRICES
             dict_price = {}
 
+            end_date = datetime.date.today()
+            start_date = datetime.date.today() - pd.Timedelta(days=3)
+            tickers_price_df = yf.download(tickers=tickers_lst,start=start_date,end=end_date,interval='1d')
+
             for ticker in tickers_lst:
 
                 if ticker not in stored_dict_price.keys():
 
-                    dict_price[ticker] = float(fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Price'])
-                    time.sleep(0.3)
+                    dict_price[ticker] = tickers_price_df.at[len(tickers_price_df) - 1,('Close',ticker)]
 
                 else:
 
@@ -400,8 +407,7 @@ def filter_by_min_mkcap(tickers_lst:list,dict_tickers_inc_stat:dict):
 
         #GET MARKET CAP
         ticker_inc_stat_df = dict_tickers_inc_stat[ticker].copy()
-        ticker_inc_stat_df = ticker_inc_stat_df.replace(",","",regex=True)
-        recent_mk_cap = pd.to_numeric(ticker_inc_stat_df.loc['Market Capitalization',ticker_inc_stat_df.columns[1]])
+        recent_mk_cap = ticker_inc_stat_df.loc['Market Capitalization',ticker_inc_stat_df.columns[0]]
 
         if recent_mk_cap > minimum_mkcap :
 
