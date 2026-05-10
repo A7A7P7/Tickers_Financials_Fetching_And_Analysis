@@ -1,4 +1,6 @@
 #%%
+
+#USAGE ONLY MAKES SENSE WHENEVER A LARGE NUMBER OF TICKERS IS COMPARED, OTHWERWISE THE ANALYSIS IS NARROWED.
 def run_with_finviz_yf():
 
     data_prov_input = int(input("WHICH DATA PROVIDER YOU WANT TO FETCH FROM, 'finviz' (ANSWER 0) OR 'yfinance' (ANSWER 1): "))

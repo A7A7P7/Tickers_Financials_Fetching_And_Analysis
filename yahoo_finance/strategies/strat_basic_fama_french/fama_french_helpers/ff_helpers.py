@@ -129,14 +129,17 @@ def ticker_value_factor(tickers,dict_financials): #ALSO RATIOS, SO CURRENCY OF T
 
     dict_value = dict()
     bal_sheet_dict = dict_financials['bal_sheet']
+    inc_stat_dict = dict_financials['inc_stat']
 
     for ticker in tickers:
 
         dict_value[ticker] = dict()
-        ticker_df = bal_sheet_dict[ticker]
-        ticker_df_columns = ticker_df.columns
-        price_earnings = ticker_df.at["Price To Earnings Ratio",ticker_df_columns[0]]
-        price_book = ticker_df.at["Price to Book Ratio",ticker_df_columns[0]]
+        ticker_df_bal_sheet = bal_sheet_dict[ticker]
+        ticker_df_columns_bal_sheet = ticker_df_bal_sheet.columns
+        ticker_df_inc_stat = inc_stat_dict[ticker]
+        ticker_df_columns_inc_stat = ticker_df_inc_stat.columns
+        price_earnings = ticker_df_inc_stat.at["Price To Earnings Ratio",ticker_df_columns_inc_stat[0]]
+        price_book = ticker_df_bal_sheet.at["Price to Book Ratio",ticker_df_columns_bal_sheet[0]]
 
         if np.isnan(price_earnings):
 
@@ -1193,8 +1196,9 @@ def yield_ticker_metrics(possible_tickers:list,profit_data:dict,value_data:dict,
 
 """UPDATE OR RETRIEVE TICKERS FACTOR SUCH AS VALUE, BETA OR MOMENTUM"""
 
-def first_fetch_or_storage_on_directory(tickers_lst:list,dict_inc_stat_tickers:dict):
+def first_fetch_or_storage_on_directory(tickers_lst:list,dict_all_three_statements:dict):
 
+    dict_inc_stat_tickers = dict_all_three_statements['inc_stat']
     directory_to_park_or_get_from_storage = Path(input("PROVIDE A DIRECTORY TO A/THE FOLDER WHERE STORAGE INTO CSV IS OR WILL OCCUR: ").strip().strip('"').strip("'"))
     values_needed_to_fetch_outside = ['Value','Beta','Momentum']
     value_beta_momentum = str(input(f"WHAT FACTOR ARE YOU SEEKING {values_needed_to_fetch_outside[0]},{values_needed_to_fetch_outside[1]} OR {values_needed_to_fetch_outside[2]} (ANSWER EITHER ONE OF THE FACTORS): "))
@@ -1217,7 +1221,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list,dict_inc_stat_tickers:d
 
         if fetch_refetch_storage.upper() == 'NO':
 
-            dict_value_factor = ticker_value_factor(tickers_lst)
+            dict_value_factor = ticker_value_factor(tickers_lst,dict_all_three_statements)
             df_value_factor = pd.DataFrame(dict_value_factor.values(),dict_value_factor.keys())
             df_value_factor \
              .to_csv(directory_to_park_or_get_from_storage / f"{name}.csv")
@@ -1234,7 +1238,7 @@ def first_fetch_or_storage_on_directory(tickers_lst:list,dict_inc_stat_tickers:d
 
             if refetch_or_not.upper() == 'YES':
 
-                dict_value_factor = ticker_value_factor(tickers_lst)
+                dict_value_factor = ticker_value_factor(tickers_lst,dict_all_three_statements)
                 keys_chosen_tickers = dict_value_factor.keys()
 
                 #TAKE OUT THE STORED FILE AND CHECK OUT IF THE TICKER IS THERE, AND IF NOT PUT IT THERE, OTHERWISE JUST UPDATE
