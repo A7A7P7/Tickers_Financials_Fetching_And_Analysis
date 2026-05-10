@@ -458,10 +458,11 @@ def create_and_store_or_update_tickers_parquet_files_from_df_financials(dict_thr
                         for i in range(len(df_fetched),len(df_fetched) + n_cols_added):
 
                             period = recent_df_periods[i]
-                            col_name = ticker_saved_financial.loc['Period'].eq(period).idxmax()
+                            col_name = ticker_saved_financial.loc['Period End Date'].eq(period).idxmax()
                             col_df = ticker_saved_financial[col_name].to_frame()
                             col_df.columns = [i]
                             df_periods_not_in_recent_df = pd.concat([df_periods_not_in_recent_df,col_df],axis=1)
+                            df_periods_not_in_recent_df.index = df_fetched.index
 
                         df_to_be_stored = df_periods_not_in_recent_df
 
