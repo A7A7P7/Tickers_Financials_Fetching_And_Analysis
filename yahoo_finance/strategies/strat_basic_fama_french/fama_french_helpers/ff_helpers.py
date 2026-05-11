@@ -156,6 +156,8 @@ def ticker_value_factor(tickers,dict_financials): #ALSO RATIOS, SO CURRENCY OF T
 
                 print("yfinance HAS P/E RATIO FOR TICKER",ticker, "OF",pe)
                 dict_value[ticker]['P/E'] = float(pe).__round__(2)
+                ticker_df_inc_stat.at["Price To Earnings Ratio",ticker_df_columns_inc_stat[0]] = dict_value[ticker]['P/E']
+                inc_stat_dict[ticker] = ticker_df_inc_stat
 
         else:
 
@@ -176,6 +178,8 @@ def ticker_value_factor(tickers,dict_financials): #ALSO RATIOS, SO CURRENCY OF T
 
                 print("yfinance HAS P/B RATIO FOR TICKER",ticker, "OF",pb)
                 dict_value[ticker]['P/B'] = float(pb).__round__(2)
+                ticker_df_bal_sheet.at["Price to Book Ratio",ticker_df_columns_bal_sheet[0]] = dict_value[ticker]['P/B']
+                bal_sheet_dict  [ticker] = ticker_df_bal_sheet
 
         else:
 

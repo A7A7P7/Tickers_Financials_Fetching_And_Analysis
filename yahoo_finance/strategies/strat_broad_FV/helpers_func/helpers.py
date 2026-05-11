@@ -152,6 +152,7 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
 
     valuation_dict = dict()
     unusable_tickers = []
+    usable_tickers = []
 
     for ticker in tickers_lst:
 
@@ -207,7 +208,7 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
                     if debt_coverage_year >= sht_debt_year*1.5:
                         years_debt_approval_most_recent_3 +=1
 
-            past_years_debt_coverage_approval = True if years_debt_approval_most_recent_3 == 3 else False
+            past_years_debt_coverage_approval = True if years_debt_approval_most_recent_3 == 3 else False #GOOD DEBT LAST 3 YEARS
             all_years_debt_coverage_approval = True if years_of_debt_approval == len(df)-1 else False
 
             cond_eps_cagr = eps_cagr > cagr_eps_min
@@ -221,6 +222,7 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
 
             if combined_conds:
 
+                usable_tickers.append(ticker)
                 if n_years_positive_eps < n_years:
 
                     negative_values = df["EPS (Diluted)"].where(df["EPS (Diluted)"] < 0).sum()
@@ -266,9 +268,15 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
                 valuation_dict[ticker]['Current_Price'] = current_price
                 valuation_dict[ticker]['Under(+)/Over(-)_Valuation'] = f"{(price_factor-1)*100}% Undervalued" if price_factor > 1 else f"{(price_factor-1)*100}% Overvalued"
 
+            else:
+
+                unusable_tickers.append(ticker)
+
         else:
 
-            unusable_tickers.append(ticker)
+            if ticker not in unusable_tickers:
+
+                unusable_tickers.append(ticker)
 
     #ORDER VALUATION_DICT IN A WAY WHERE MOST UNDERVALUED STOCKS APPEAR FIRST
     dict_price_factor = dict()
@@ -285,8 +293,7 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
 
         ordered_valuation_dict[key] = valuation_dict[key]
 
-    return {'ticker_price_factor' : ordered_valuation_dict, 'unusable_tickers' : unusable_tickers}
-
+    return {'ticker_price_factor' : ordered_valuation_dict,'usable_tickers' : usable_tickers, 'unusable_tickers' : unusable_tickers}
 #%%
 
 """GET MARKET PRICES FROM yfinance"""
