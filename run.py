@@ -93,10 +93,3 @@ directory_for_storage_retrieval = organizing_tickers.directory_for_storage_or_re
 dict_all_tickers_all_financials = organizing_tickers.dict_all_financials_and_tickers
 most_similar_tickers = organizing_tickers.similar_tickers_lst
 
-
-
-# %%
-
-dict_all_tickers_all_financials['inc_stat']['EDP.LS']
-
-

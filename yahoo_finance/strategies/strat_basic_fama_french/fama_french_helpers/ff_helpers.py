@@ -235,8 +235,8 @@ def dates_of_reporting_comparable(dict_inc_stat_tickers:dict,new_tickers:list):
         n_cols_ticker = len(ticker_reporting_dates)
         if len(dict_comparable_reporting_dates) == 0:
 
-            dict_comparable_reporting_dates["comp_report_dates_1"] = list()
-            dict_comparable_reporting_dates["comp_report_dates_1"].append(ticker)
+            dict_comparable_reporting_dates["comp_report_dates_0"] = list()
+            dict_comparable_reporting_dates["comp_report_dates_0"].append(ticker)
 
         else:
 
@@ -274,8 +274,8 @@ def dates_of_reporting_comparable(dict_inc_stat_tickers:dict,new_tickers:list):
 
             if keys_follow == number_of_dict_keys:
 
-                dict_comparable_reporting_dates[f"comp_report_dates{keys_follow}"] = list()
-                dict_comparable_reporting_dates[f"comp_report_dates{keys_follow}"].append(ticker)
+                dict_comparable_reporting_dates[f"comp_report_dates_{keys_follow}"] = list()
+                dict_comparable_reporting_dates[f"comp_report_dates_{keys_follow}"].append(ticker)
 
     for key in dict_comparable_reporting_dates:
 
@@ -303,7 +303,6 @@ def ticker_momentum(dict_inc_stat_tickers:dict,tickers:list): #ONLY CONSIDERS PR
     dict_comparable_reporting = dates_of_reporting_comparable(dict_inc_stat_tickers,tickers)
     lst_different_comparables = [dict_comparable_reporting[key] for key in dict_comparable_reporting]
     dict_momentum = dict()
-    print(lst_different_comparables)
 
     for lst in lst_different_comparables:
 
@@ -329,25 +328,37 @@ def ticker_momentum(dict_inc_stat_tickers:dict,tickers:list): #ONLY CONSIDERS PR
 
         else:
 
-            com_tickers_df_idx = comp_tickers_df.index
+            if len(comp_tickers_df) == 0:
 
-            for ticker in lst:
+                for ticker in lst:
 
-                dict_momentum[ticker] = dict()
-                past_year_performance = (comp_tickers_df.at[com_tickers_df_idx[len(comp_tickers_df)-1],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[0],("Close",ticker)])-1
-                day_of_last_idx = com_tickers_df_idx[len(comp_tickers_df)-1].day
-                idx_of_end_past_month = len(comp_tickers_df)-1 if day_of_last_idx >= 20 else len(comp_tickers_df)-2
-                idx_of_start_past_month = len(comp_tickers_df) - 19 if day_of_last_idx >= 20 else len(comp_tickers_df) - 20
-                past_month_performance = (comp_tickers_df.at[com_tickers_df_idx[idx_of_end_past_month],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[idx_of_start_past_month],("Close",ticker)])-1
-
-                if np.isnan(past_year_performance) or np.isnan(past_month_performance):
-
+                    dict_momentum[ticker] = dict()
                     dict_momentum[ticker]['Momentum_Factor'] = f"NON-EXISTENT,{ticker} DOESN'T HAVE PRICING HISTORY TO COMPUTE MOMENTUM"
+                    print(rf"TICKER {ticker} DON'T HAVE PRICING HISTORY FOR MOMENTUM FACTOR")
 
-                else:
+            else:
 
-                    momentum_factor = ((1+past_year_performance)/(1+past_month_performance)) - 1
-                    dict_momentum[ticker]['Momentum_Factor'] = momentum_factor
+                com_tickers_df_idx = comp_tickers_df.index
+
+                for ticker in lst:
+
+                    dict_momentum[ticker] = dict()
+                    past_year_performance = (comp_tickers_df.at[com_tickers_df_idx[len(comp_tickers_df)-1],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[0],("Close",ticker)])-1
+                    day_of_last_idx = com_tickers_df_idx[len(comp_tickers_df)-1].day
+                    idx_of_end_past_month = len(comp_tickers_df)-1 if day_of_last_idx >= 20 else len(comp_tickers_df)-2
+                    idx_of_start_past_month = len(comp_tickers_df) - 19 if day_of_last_idx >= 20 else len(comp_tickers_df) - 20
+                    past_month_performance = (comp_tickers_df.at[com_tickers_df_idx[idx_of_end_past_month],("Close",ticker)] / comp_tickers_df.at[com_tickers_df_idx[idx_of_start_past_month],("Close",ticker)])-1
+
+                    if np.isnan(past_year_performance) or np.isnan(past_month_performance):
+
+                        dict_momentum[ticker]['Momentum_Factor'] = f"NON-EXISTENT,{ticker} DOESN'T HAVE PRICING HISTORY TO COMPUTE MOMENTUM"
+                        print(rf"TICKER {ticker} DON'T HAVE PRICING HISTORY FOR MOMENTUM FACTOR")
+
+                    else:
+
+                        momentum_factor = ((1+past_year_performance)/(1+past_month_performance)) - 1
+                        dict_momentum[ticker]['Momentum_Factor'] = momentum_factor
+                        print(rf"TICKER {ticker} MOMENTUM FACTOR IS {momentum_factor}")
 
     return dict_momentum
 
