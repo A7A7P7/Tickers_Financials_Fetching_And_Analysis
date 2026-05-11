@@ -3487,35 +3487,6 @@ df_inc_stat
 match_tickers_with_three_statements(dict_all_financials,['FLS.CO','NVG.LS','SON.LS','GTT.PA'])
 
 
-
-#%%
-
-dict_adjust_inc_stat = {'inc_stat':{}}
-tickers_pe_full = []
-
-for ticker in dict_ticker_financials['inc_stat'].keys():
-
-
-    df = dict_ticker_financials['inc_stat'][ticker]
-    df = df.loc[df.index.difference(["Period End Date","Currency of Prices","Currency of Financial Reporting"])]
-    count_nan = 0
-    idx = df.index
-    for var in idx:
-
-        val_in_col = df.at[var,df.columns[len(df.columns)-1]]
-        if np.isnan(val_in_col):
-
-            count_nan += 1
-
-    if count_nan     len(idx) > 0.5:
-
-        new_df = df.drop(columns=[df.columns[len(df.columns)-1]])
-        dict_adjust_inc_stat['inc_stat'][ticker] = new_df
-
-    else:
-
-        dict_adjust_inc_stat['inc_stat'][ticker] = df
-
 #%%
 
 dict_adjust_inc_stat['inc_stat'].keys()

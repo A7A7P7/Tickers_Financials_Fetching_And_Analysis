@@ -43,8 +43,5 @@ tickers_shareholder_yield = help_func.shareholder_yield(tickers_lst,dict_all_tic
 tickers_shareholder_yield
 
 
-#%%
-
-file = from miscellaneous.help_func import help_func
 
 

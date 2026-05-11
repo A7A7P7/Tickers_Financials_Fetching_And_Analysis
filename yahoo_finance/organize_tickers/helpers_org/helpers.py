@@ -772,12 +772,12 @@ def chosen_tickers(directory_for_storage_or_retrieval):
                 if suffix == ".csv" : #iShares or BlackRock excel
 
                     #GET THE TERMINATIONS OF EACH EXCHANGE FOR EUROPEAN TICKERS
-                    exchanges_termination_dict = helpers.get_european_exchange_terminations()
-                    tickers_lst = helpers.get_tickers_to_yf_from_excel_blackrock(directory_to_etf,exchanges_termination_dict)
+                    exchanges_termination_dict = get_european_exchange_terminations()
+                    tickers_lst = get_tickers_to_yf_from_excel_blackrock(directory_to_etf,exchanges_termination_dict)
 
                 else: #".xlsx"
 
-                    dict_tickers = helpers.get_tickers_to_yf_from_excel_state_street(directory_to_etf)
+                    dict_tickers = get_tickers_to_yf_from_excel_state_street(directory_to_etf)
                     tickers_lst = dict_tickers["usable_tickers"]
 
                 return tickers_lst
@@ -1104,13 +1104,13 @@ def chosen_tickers(directory_for_storage_or_retrieval):
                     if suffix == ".csv" : #iShares or BlackRock excel
 
                         #GET THE TERMINATIONS OF EACH EXCHANGE FOR EUROPEAN TICKERS
-                        exchanges_termination_dict = helpers.get_european_exchange_terminations()
-                        tickers_lst = helpers.get_tickers_to_yf_from_excel_blackrock(directory_of_storage,exchanges_termination_dict)
+                        exchanges_termination_dict = get_european_exchange_terminations()
+                        tickers_lst = get_tickers_to_yf_from_excel_blackrock(directory_of_storage,exchanges_termination_dict)
                         return tickers_lst
 
                     else: #".xlsx"
 
-                        dict_tickers = helpers.get_tickers_to_yf_from_excel_state_street(directory_of_storage)
+                        dict_tickers = get_tickers_to_yf_from_excel_state_street(directory_of_storage)
                         tickers_lst = dict_tickers['usable_tickers']
 
                     return tickers_lst
@@ -1267,13 +1267,13 @@ def chosen_tickers(directory_for_storage_or_retrieval):
                 if suffix == ".csv" : #iShares or BlackRock excel
 
                     #GET THE TERMINATIONS OF EACH EXCHANGE FOR EUROPEAN TICKERS
-                    exchanges_termination_dict = helpers.get_european_exchange_terminations()
-                    tickers_lst = helpers.get_tickers_to_yf_from_excel_blackrock(directory_of_storage,exchanges_termination_dict)
+                    exchanges_termination_dict = get_european_exchange_terminations()
+                    tickers_lst = get_tickers_to_yf_from_excel_blackrock(directory_of_storage,exchanges_termination_dict)
 
 
                 else: #".xlsx"
 
-                    dict_tickers = helpers.get_tickers_to_yf_from_excel_state_street(directory_of_storage)
+                    dict_tickers = get_tickers_to_yf_from_excel_state_street(directory_of_storage)
                     tickers_lst = dict_tickers['usable_tickers']
 
                 return tickers_lst
