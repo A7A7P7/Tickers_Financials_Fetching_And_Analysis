@@ -98,14 +98,18 @@ The short version, for copy-pasters:
 ### Windows (PowerShell)
 
 ```powershell
-# 1. Clone the repo
-git clone <REPO_URL> Tickers_Financials
-cd Tickers_Financials
 
-# 2. One-click setup (creates venv + installs everything)
-powershell -ExecutionPolicy Bypass -File .\setup.ps1
+# 1. Set Directory to clone the project
+cd Wanted_Directory
 
-# 3. Open in VSCode — accept the "Install recommended extensions" prompt
+# 2. Clone the repo
+git clone <REPO_URL>
+cd Tickers_Financials_Fetching_And_Analysis
+
+# 3. One-click setup (creates venv + installs everything)
+powershell -ExecutionPolicy Bypass -File    Wanted_Directory\Tickers_Financials_Fetching_And_Analysis\setup.ps1
+
+# 4. Open in VSCode — accept the "Install recommended extensions" prompt
 code .
 
 # 4. Run the friendly dashboard
@@ -116,9 +120,12 @@ streamlit run app.py
 ### macOS / Linux / WSL (bash)
 
 ```bash
+
+# 0. NOTE: I DID NOT TRY THIS PROCEDURE IN THIS OPERATING SYSTEM.
+
 # 1. Clone the repo
-git clone <REPO_URL> Tickers_Financials
-cd Tickers_Financials
+git clone <REPO_URL>
+cd Tickers_Financials_Fetching_And_Analysis
 
 # 2. One-click setup
 chmod +x setup.sh

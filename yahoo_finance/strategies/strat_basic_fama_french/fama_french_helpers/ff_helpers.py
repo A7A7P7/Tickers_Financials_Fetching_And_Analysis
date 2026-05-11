@@ -58,7 +58,7 @@ def ticker_profitability_factor(tickers,dict_financials): #FACTOR CONSIDERS RATI
         record_revenues = pd.to_numeric(ticker_inc_stat.loc['Total Revenue'][1:n_years_lookback_to_compute_average+1])
         record_ebit = pd.to_numeric(ticker_inc_stat.loc['Operating Income'][1:n_years_lookback_to_compute_average+1])
 
-        operating_margin_avg = (record_ebit/record_revenues).mean().round(decimals=2)
+        operating_margin_avg = (record_ebit/record_revenues).mean().__round__(2)
         if float(operating_margin_avg) == float("inf") or float(operating_margin_avg) == float("-inf"): #ANY TICKER HAS REVENUE OF 0
 
             dict_profitability[ticker][f"Op_Margin_{n_years_lookback_to_compute_average}y_AVG_AbsVal"] = "ANY TICKER HAS REVENUE OF 0 IN OF THE YEARS CONSIDERED"

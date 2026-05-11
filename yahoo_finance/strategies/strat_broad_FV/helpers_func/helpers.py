@@ -103,7 +103,7 @@ def get_metrics_for_analysis(tickers_lst,dict_bs,dict_inc_stat):
 
         print(ticker)
 
-        ticker_dict_inc_stat_metrics = historical_metric(dict_inc_stat[ticker],m1 = "EPS (Diluted)", m2 = "Price To Earnings Ratio",m3 = "Total Revenue",m4 = "Operating Income",m5 = "Shares Outstanding")
+        ticker_dict_inc_stat_metrics = historical_metric(dict_inc_stat[ticker],m1 = "EPS (Diluted)", m2 = "Price To Earnings Ratio",m3 = "Total Revenue",m4 = "Operating Income",m5 = "Shares Outstanding (Diluted)")
         ticker_dict_bs_metrics = historical_metric(dict_bs[ticker],m1 = "Cash & Short Term Investments",m2 = "Short Term Debt Incl. Current Port. of LT Debt")
 
         ticker_df_bs = pd.DataFrame.from_dict(ticker_dict_bs_metrics)
@@ -301,7 +301,7 @@ def get_tickers_market_prices(tickers_lst:list):
 
     for ticker in tickers_lst:
 
-        dict_price[ticker] = tickers_price_df.at[len(tickers_price_df) - 1,('Close',ticker)]
+        dict_price[ticker] = tickers_price_df.at[tickers_price_df.index[len(tickers_price_df) - 1],('Close',ticker)]
         print("PRICE OFF",ticker,dict_price[ticker])
 
     return dict_price
@@ -372,7 +372,7 @@ def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored
 
                 if ticker not in stored_dict_price.keys():
 
-                    dict_price[ticker] = tickers_price_df.at[len(tickers_price_df) - 1,('Close',ticker)]
+                    dict_price[ticker] = tickers_price_df.at[tickers_price_df.index[len(tickers_price_df) - 1],('Close',ticker)]
 
                 else:
 
