@@ -129,7 +129,7 @@ def get_metrics_for_analysis(tickers_lst,dict_bs,dict_inc_stat):
 
             df_variables['Sht_Debt_Coverage_Abs_Val'] = df_variables['Cash & Short Term Investments'] - df_variables['Short Term Debt Incl. Current Port. of LT Debt']
 
-            df_variables = df_variables.loc[:,["EPS (Diluted)","Price To Earnings Ratio","Shares Outstanding","Total Revenue","Operating Income","Op.Margin","Cash & Short Term Investments","Short Term Debt Incl. Current Port. of LT Debt","Sht_Debt_Coverage_Abs_Val"]]
+            df_variables = df_variables.loc[:,["EPS (Diluted)","Price To Earnings Ratio","Shares Outstanding (Diluted)","Total Revenue","Operating Income","Op.Margin","Cash & Short Term Investments","Short Term Debt Incl. Current Port. of LT Debt","Sht_Debt_Coverage_Abs_Val"]]
 
             dict_tickers_dfs[ticker] = df_variables
 
@@ -182,7 +182,7 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
 
             eps_cagr = ((df.at[df_index[n_years],"EPS (Diluted)"] / df.at[df_index[0],"EPS (Diluted)"]) ** (1/n_years)) - 1
             rev_cagr = ((df.at[df_index[n_years],"Total Revenue"] / df.at[df_index[0],"Total Revenue"]) ** (1/n_years)) - 1
-            sh_out_cagr = ((df.at[df_index[n_years],"Shares Outstanding"] / df.at[df_index[0],"Shares Outstanding"]) ** (1/n_years)) - 1
+            sh_out_cagr = ((df.at[df_index[n_years],"Shares Outstanding (Diluted)"] / df.at[df_index[0],"Shares Outstanding (Diluted)"]) ** (1/n_years)) - 1
             op_margin_cagr = ((df.at[df_index[n_years],"Op.Margin"] / df.at[df_index[0],"Op.Margin"]) ** (1/n_years)) - 1
             past_years_debt_coverage_approval = False
             all_years_debt_coverage_approval = False

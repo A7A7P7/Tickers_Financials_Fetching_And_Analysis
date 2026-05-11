@@ -12,7 +12,6 @@ def run_with_finviz_yf():
 
     if data_prov_input == 0: #FINVIZ USAGE
 
-        from finviz_us.helpers_file_root import helpers_root
         from finviz_us.organize_tickers import organizing_tickers
         from finviz_us.strategies.strat_broad_FV.func_strat_run import run_broad_fv
         from finviz_us.strategies.strat_basic_fama_french.func_run_strat import run_basic_fam_fre
@@ -35,13 +34,8 @@ def run_with_finviz_yf():
             "broad_FValue": strat_FV_from_financials
         }
 
-        strategy_choosen = helpers_root.choose_strategy(strategies)
-
-        return strategy_choosen
-
     else: #yfinance USAGE
 
-        from finviz_us.helpers_file_root import helpers_root
         from yahoo_finance.organize_tickers import organizing_tickers
         from yahoo_finance.strategies.strat_broad_FV.func_strat_run import run_broad_fv
         from yahoo_finance.strategies.strat_basic_fama_french.func_run_strat import run_basic_fam_fre
@@ -64,17 +58,29 @@ def run_with_finviz_yf():
             "broad_FValue": strat_FV_from_financials
         }
 
-        strategy_choosen = helpers_root.choose_strategy(strategies)
+    return strategies
 
-        return strategy_choosen
+def strat_choose(dict_strategies:dict):
+
+    from finviz_us.helpers_file_root import helpers_root
+    strategy_choosen = helpers_root.choose_strategy(dict_strategies)
+
+    return strategy_choosen
 
 #%%
 
-strat_output = run_with_finviz_yf()
+dict_strats = run_with_finviz_yf()
 
 #%%
 
-strat_output
+strat_chosen = strat_choose(dict_strats)
+
+#%%
+
+strat_chosen
+
+#FROM STRATEGY 'broad_FValue' If Price SCORES IS EMPTY IT MEANS THAT THE TICKERS DIDN'T ACCOMPLISH ALL THE NEEDED PARAMETERS.
+#SAME FOR 'fama_french', IF SOME TICKERS ARE NOT THERE IT MEANS SOME DATA MIGHT BE MISSING, OR THE COMPANY DOESN'T FULLFILL SOME SET OF CRITERIA
 
 #%%
 
