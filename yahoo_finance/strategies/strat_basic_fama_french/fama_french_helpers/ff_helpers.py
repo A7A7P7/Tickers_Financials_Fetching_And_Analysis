@@ -161,7 +161,7 @@ def ticker_value_factor(tickers,dict_financials): #ALSO RATIOS, SO CURRENCY OF T
 
         else:
 
-            dict_value[ticker]['P/E'] = price_earnings
+            dict_value[ticker]['P/E'] = float(price_earnings)
 
         if np.isnan(price_book):
 
@@ -179,11 +179,11 @@ def ticker_value_factor(tickers,dict_financials): #ALSO RATIOS, SO CURRENCY OF T
                 print("yfinance HAS P/B RATIO FOR TICKER",ticker, "OF",pb)
                 dict_value[ticker]['P/B'] = float(pb).__round__(2)
                 ticker_df_bal_sheet.at["Price to Book Ratio",ticker_df_columns_bal_sheet[0]] = dict_value[ticker]['P/B']
-                bal_sheet_dict  [ticker] = ticker_df_bal_sheet
+                bal_sheet_dict[ticker] = ticker_df_bal_sheet
 
         else:
 
-            dict_value[ticker]['P/B'] = price_book
+            dict_value[ticker]['P/B'] = float(price_book)
 
         if type(dict_value[ticker]['P/B']) != float or type(dict_value[ticker]['P/E']) != float:
 
@@ -792,17 +792,17 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
         max_profit = max_profit_factor > 0
         min_profit = min_profit_factor > 0
 
-        if max_profit and min_profit:
+        if max_profit and min_profit: #ALL COMPANIES INCLUDED ARE PROFITABLE
 
             how_profitable = ticker_profit_factor / max_profit_factor
 
-        elif max_profit and min_profit == False :
+        elif max_profit and min_profit == False : #SOME COMPANIES ARE PROFITABLE OTHERS ARE NOT
 
-            if ticker_profit_factor >= 0 :
+            if ticker_profit_factor >= 0 : #COMPANY IN QUESTION IS PROFITABLE
 
                 how_profitable = ticker_profit_factor / max_profit_factor
 
-            else:
+            else: # COMPANY IN QUESTION IS NOT PROFITABLE, SO MINUS IS THERE TO KEEP UNPROFITABILITY
 
                 how_profitable = - (ticker_profit_factor / min_profit_factor)
 
@@ -819,15 +819,23 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
         idx_ticker_possible_tickers = possible_tickers.index(ticker)
         ticker_value_adjust_factor = mean_value_adjusted_to_zero[idx_ticker_possible_tickers]
 
-        if max_value and min_value == False :
+        if max_value and min_value: #I DON'T THINK IT IS POSSIBLE, BUT IF HIGH IT MEANS BY VALUE IT IS OVERVALUED
+
+            how_undervalued =  - (ticker_value_adjust_factor / max_value_factor) #P/B AND P/E TENDS TO BE HIGHER
+
+        elif max_value and min_value == False : #TECHNICALLY THIS SHOULD WILL ALWAYS BE THE CASE BECAUSE MEAN ADJUSTED TO ZERO VALUES ASSUME SOME VALUES WILL BE HIGHER THAN ZERO AND OTHERS LOWER
 
             if ticker_value_adjust_factor >= 0 :
 
-                how_undervalued = - (ticker_value_adjust_factor / max_value_factor) #HIGHER VALUATIONS MEAN SUBTRACTION IN FINAL WEIGHT
+                how_undervalued = - (ticker_value_adjust_factor / max_value_factor ) #P/B AND P/E TENDS TO BE HIGHER
 
             else:
 
-                how_undervalued = ticker_value_adjust_factor / min_value_factor #LOWER VALUATION HAVE MORE WEIGHT IN FINAL SCORE
+                how_undervalued = ticker_value_adjust_factor / min_value_factor #P/B AND P/E TENDS TO BE LOWER
+
+        else: #max_value == False and min_value == False, max_value == False and min_value == True doesn't exist
+
+            how_undervalued = ticker_value_adjust_factor / min_value_factor #BETA CLOSE TO 0.
 
         #BETA_FACTOR MEASUREMENTS
 
@@ -1100,15 +1108,23 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
         idx_ticker_possible_tickers = possible_tickers.index(ticker)
         ticker_value_adjust_factor = mean_value_adjusted_to_zero[idx_ticker_possible_tickers]
 
-        if max_value and min_value == False :
+        if max_value and min_value: #I DON'T THINK IT IS POSSIBLE, BUT IF HIGH IT MEANS BY VALUE IT IS OVERVALUED
+
+            how_undervalued =  - (ticker_value_adjust_factor / max_value_factor) #P/B AND P/E TENDS TO BE HIGHER
+
+        elif max_value and min_value == False : #TECHNICALLY THIS SHOULD WILL ALWAYS BE THE CASE BECAUSE MEAN ADJUSTED TO ZERO VALUES ASSUME SOME VALUES WILL BE HIGHER THAN ZERO AND OTHERS LOWER
 
             if ticker_value_adjust_factor >= 0 :
 
-                how_undervalued = - (ticker_value_adjust_factor / max_value_factor) #HIGHER VALUATIONS MEAN SUBTRACTION IN FINAL WEIGHT
+                how_undervalued = - (ticker_value_adjust_factor / max_value_factor ) #P/B AND P/E TENDS TO BE HIGHER
 
             else:
 
-                how_undervalued = ticker_value_adjust_factor / min_value_factor #LOWER VALUATION HAVE MORE WEIGHT IN FINAL SCORE
+                how_undervalued = ticker_value_adjust_factor / min_value_factor #P/B AND P/E TENDS TO BE LOWER
+
+        else: #max_value == False and min_value == False, max_value == False and min_value == True doesn't exist
+
+            how_undervalued = ticker_value_adjust_factor / min_value_factor #BETA CLOSE TO 0.
 
         #BETA_FACTOR MEASUREMENTS
 
@@ -1132,11 +1148,11 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
 
             else:
 
-                how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+                how_low_abs_beta = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
 
         else: #max_profit == False and min_profit == False, max_profit == False and min_profit == True doesn't exist
 
-            how_profitable = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
+            how_low_abs_beta = ticker_beta_diff_factor / min_beta_factor #BETA CLOSE TO 0.
 
         #MOMENTUM_FACTOR MEASUREMENTS
 

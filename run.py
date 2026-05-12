@@ -73,6 +73,8 @@ dict_strats = run_with_finviz_yf()
 
 #%%
 
+#FIND A WAY TO INCORPORATE MKCAP INTO THE PARQUET FILE THAT IS CACHED.
+
 strat_chosen = strat_choose(dict_strats)
 
 #%%

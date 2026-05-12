@@ -16,13 +16,14 @@
 
 1. [What is this?](#-what-is-this)
 2. [Prerequisites](#-prerequisites)
-3. [🚀 Quickstart — from zero to running](#-quickstart--from-zero-to-running)
-4. [Project layout](#-project-layout)
-5. [Running the strategies](#%EF%B8%8F-running-the-strategies)
-6. [Optional: the friendly dashboard](#-optional-the-friendly-dashboard)
-7. [Troubleshooting](#-troubleshooting)
-8. [For developers](#-for-developers)
-9. [License](#-license)
+3. [🏦🧺📈 Storaging/Caching of ETFs](#-Storaging/Caching-of-ETFs)
+4. [🚀 Quickstart — from zero to running](#-quickstart--from-zero-to-running)
+5. [Project layout](#-project-layout)
+6. [Running the strategies](#%EF%B8%8F-running-the-strategies)
+7. [Optional: the friendly dashboard](#-optional-the-friendly-dashboard)
+8. [Troubleshooting](#-troubleshooting)
+9. [For developers](#-for-developers)
+10. [License](#-license)
 
 ---
 
@@ -37,9 +38,10 @@ now?"_
 It works in four steps:
 
 1. 🔍 **Scrapes** the 3 financial statements for each ticker from
-   [FinViz](https://finviz.com/) (free tier).
+   [FinViz](https://finviz.com/) (free tier) and yfinance.
 2. 💾 **Stores** them locally as Parquet files so you only pay the
-   scraping cost once (~1 hour for ~1,800 US tickers).
+   scraping cost once (~1 hour for ~1,800 US tickers,using FinViz).
+   yfinance tends to take longer as it uses ETF tickers to then use yf (~2 hour for ~1000 tickers as the number of requests is much higher than FinViz)
 3. 📊 **Scores** each company using two frameworks:
     - **Fama-French 5-Factor** — value, profitability, beta, momentum,
       investment discipline.
@@ -91,6 +93,55 @@ git --version
 
 ---
 
+## 🏦🧺📈 Storaging/Caching of ETFs
+
+
+#### Step 1 · Seek ETFs Providers
+
+The program is prepared to **ONLY** handle ETFs from **iShares** (BlackRock Branch)
+& **StateStreet** as one saw them as the most well known ETF providers that
+provided some sort of info through excel files on their holdings.
+
+Donwload the ETFs into a directory of your choice in your device.
+
+#### Step 2 - Transform the ETF Data
+
+**2.1 - iShares ETF - CURRENTLY EUROPEAN TICKERS ONLY**
+
+Whenever you download an ETF from this providers with European tickers,
+you will get .csv files. So this steps must be followed to ensure the program
+reads the ETF
+
+**2.1.1 - TRANSFORM THE CSV FILES TO PRESENT THAT DATA IN EACH CELLS**
+
+**2.1.2 - FIGURE OUT THE DATA RANGE THAT HAS THE TICKERS INFO**
+
+**2.1.3 - ERASE ANYTHING THAT IS OUTSIDE THE SCOPE OF THE RANGE WHERE THERE IS TICKER INFO**
+
+**2.1.4 - AFTER ERASING EVERYTHING, SELECT THE ENTIRE RANGE AND MOVE IT TO CELL A1**
+
+**2.1.5 - MAKE SURE TICKERS ON TICKER COLUMN THAT HAVE LETTERS AND NUMBERS ARE NOT IN FORM OF DATES, FOR EXAMPLE 'JUN3' APPEARS IN DATE AND NOT IN TICKER FORM**
+
+**AFTER THIS SAVE THE ETF BY KEEPING THE CSV FORMAT WHEN SAVING AND IT IS READY TO BE WORKED**
+
+**2.2 - StateStreet ETF - CURRENTLY EUROPEAN TICKERS ONLY**
+
+Whenever you download an ETF from this providers with tickers,
+you will get .xlsx files. So this steps must be followed to ensure the program
+reads the ETF.
+
+**2.2.1 - FIGURE OUT THE DATA RANGE THAT HAS THE TICKERS INFO**
+
+**2.2.2 - ERASE ANYTHING THAT IS OUTSIDE THE SCOPE OF THE RANGE WHERE THERE IS TICKER INFO**
+
+**2.2.3 - AFTER ERASING EVERYTHING, SELECT THE ENTIRE RANGE AND MOVE IT TO CELL A1**
+
+**2.2.4 - MAKE SURE TICKERS ON TICKER COLUMN THAT HAVE LETTERS AND NUMBERS ARE NOT IN FORM OF DATES, FOR EXAMPLE 'JUN3' APPEARS IN DATE AND NOT IN TICKER FORM**
+
+**AFTER THIS SAVE THE ETF BY KEEPING THE CSV FORMAT WHEN SAVING AND IT IS READY TO BE WORKED**
+
+---
+
 ## 🚀 Quickstart — from zero to running
 
 The short version, for copy-pasters:
@@ -112,7 +163,7 @@ powershell -ExecutionPolicy Bypass -File    Wanted_Directory\Tickers_Financials_
 # 4. Open in VSCode — accept the "Install recommended extensions" prompt
 code .
 
-# 4. Run the friendly dashboard
+# 5. Run the friendly dashboard - OPTIONAL, NO NEED UF YOU RUN AT THE IDE
 .\venv\Scripts\Activate.ps1
 streamlit run app.py
 ```
@@ -238,12 +289,17 @@ Stop the dashboard with **Ctrl+C** in the terminal.
 Inside the same venv-activated terminal:
 
 ```bash
-python -m finviz_us.strategies_run
+python -m run.py
 ```
 
 The script will ask a series of questions — directory for storage, list of
 tickers, number of years for averages, etc. Answer them and wait.
-On first run with ~1,800 tickers, expect **45 – 60 minutes**.
+On first run with ~1,800 tickers for FinViz, expect **45 – 60 minutes**.
+For yfinance depending on the numbers of tickers you use, either individually
+or scrapping from ETF time varies. If no previous storage and ETF has a large
+number of tickers, yfinance can take up to **2-3 hours** in the first run and
+every time you decide to update a storage of yours.(assuming you already have
+a large number or cached tickers)
 
 </details>
 

@@ -2930,11 +2930,13 @@ def add_ons_to_df_inc_stat(dict_inc_stat_tickers:dict,new_tickers:list):
             if np.isnan(price) and count_loop==0:
 
                 try:
+
                     mcap = yf.Ticker(ticker).info["marketCap"]
 
                 except KeyError:
 
                     print("CURRENT MARKET CAP OF TICKER",ticker,"IS NOT AVAILABLE AT yfinance")
+                    mkcap_list.append(np.nan) #THIS IS ADDED, RETEST THE PROCEDURE.
 
                 else:
 
@@ -2942,7 +2944,8 @@ def add_ons_to_df_inc_stat(dict_inc_stat_tickers:dict,new_tickers:list):
 
             else:
 
-                mkcap_list.append(price*shares)
+                mkcap_val = price*shares if (np.isnan(price) == False and np.isnan(shares) == False) else np.nan
+                mkcap_list.append(mkcap_val)
 
             count_loop += 1
 
@@ -3193,6 +3196,7 @@ def add_on_financials_after_updates(tickers_for_update:list,directory_for_storag
         mkcap_list = []
 
         try:
+
             mcap = yf.Ticker(ticker).info["marketCap"]
 
         except KeyError:
@@ -3205,7 +3209,7 @@ def add_on_financials_after_updates(tickers_for_update:list,directory_for_storag
 
             mkcap_in_millions = mcap / 1000000
             mkcap_list.append(mkcap_in_millions) #TO PUT MKCAP IN MILLIONS
-            for i in range(len_cols-1):
+            for i in range(len_cols-1):#FIRST VALUE IS 'mkcap_in_millions'
                 mkcap_list.append(np.nan)
             time.sleep(0.3 + random.uniform(0, 0.3))
 
