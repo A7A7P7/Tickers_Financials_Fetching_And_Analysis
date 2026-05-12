@@ -16,7 +16,7 @@
 
 1. [What is this?](#-what-is-this)
 2. [Prerequisites](#-prerequisites)
-3. [🏦🧺📈 Storaging&Caching of ETFs](#-Storaging&Caching-of-ETFs)
+3. [🏦🧺📈 Storaging of ETFs](#-storaging-of-ETFs)
 4. [🚀 Quickstart — from zero to running](#-quickstart--from-zero-to-running)
 5. [Project layout](#-project-layout)
 6. [Running the strategies](#%EF%B8%8F-running-the-strategies)
@@ -93,7 +93,7 @@ git --version
 
 ---
 
-## 🏦🧺📈 Storaging&Caching of ETFs
+## 🏦🧺📈 Storaging of ETFs
 
 
 #### Step 1 · 🔎 Seek ETFs Providers
