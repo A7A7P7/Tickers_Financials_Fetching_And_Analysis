@@ -408,6 +408,8 @@ def ticker_investment_factor(tickers,dict_financials): #ALSO CURRENCY OF THE STO
 
         dict_investment[ticker]["Investment_Factor_AbsVal"] = (dict_investment[ticker][f"Gross_FixAsset_Inc_{n_years_lookback_to_compute_average}y_AVG_AbsVal"] / dict_investment[ticker][f"Total_Assets_{n_years_lookback_to_compute_average}y_AVG"]).round(decimals = 3)
 
+        dict_investment[ticker]["Investment_Factor_AbsVal"] = "No Value" if np.isnan(dict_investment[ticker]["Investment_Factor_AbsVal"]) else dict_investment[ticker]["Investment_Factor_AbsVal"]
+
     return dict_investment
 
 #%%
@@ -429,7 +431,7 @@ def standardized_raking_sector_buys(tickers_lst:list,profit_data:dict,value_data
     for ticker in tickers_lst:
 
         cond_1 = type(profit_data[ticker]["Profitability_Factor_AbsVal"]) != str
-        cond_2 = type(value_data[ticker]["AVG_Value_Metrics"]) != str
+        cond_2 = type(value_data[ticker]["AVG_Value_Metrics"]) != str and value_data[ticker]["AVG_Value_Metrics"] != float('-inf') and value_data[ticker]["AVG_Value_Metrics"] != float('inf')
         cond_3 = type(beta_data[ticker]["Beta"]) != str
         cond_4 = type(momentum_data[ticker]["Momentum_Factor"]) != str
         cond_5 = type(investment_data[ticker]["Investment_Factor_AbsVal"]) != str
@@ -555,7 +557,7 @@ def standardized_raking_sector_buys_no_momentum(tickers_lst:list,profit_data:dic
     for ticker in tickers_lst:
 
         cond_1 = type(profit_data[ticker]["Profitability_Factor_AbsVal"]) != str
-        cond_2 = type(value_data[ticker]["AVG_Value_Metrics"]) != str
+        cond_2 = type(value_data[ticker]["AVG_Value_Metrics"]) != str and value_data[ticker]["AVG_Value_Metrics"] != float('-inf') and value_data[ticker]["AVG_Value_Metrics"] != float('inf')
         cond_3 = type(beta_data[ticker]["Beta"]) != str
         cond_4 = type(momentum_data[ticker]["Momentum_Factor"]) != str
         cond_5 = type(investment_data[ticker]["Investment_Factor_AbsVal"]) != str
@@ -680,7 +682,7 @@ def raking_sector_buys(tickers_lst:list,profit_data:dict,value_data:dict,beta_da
     for ticker in tickers_lst:
 
         cond_1 = type(profit_data[ticker]["Profitability_Factor_AbsVal"]) != str
-        cond_2 = type(value_data[ticker]["AVG_Value_Metrics"]) != str
+        cond_2 = type(value_data[ticker]["AVG_Value_Metrics"]) != str and value_data[ticker]["AVG_Value_Metrics"] != float('-inf') and value_data[ticker]["AVG_Value_Metrics"] != float('inf')
         cond_3 = type(beta_data[ticker]["Beta"]) != str
         cond_4 = type(momentum_data[ticker]["Momentum_Factor"]) != str
         cond_5 = type(investment_data[ticker]["Investment_Factor_AbsVal"]) != str
@@ -953,7 +955,7 @@ def raking_sector_buys_value_only_pricetobook(tickers_lst:list,profit_data:dict,
     for ticker in tickers_lst:
 
         cond_1 = type(profit_data[ticker]["Profitability_Factor_AbsVal"]) != str
-        cond_2 = type(value_data[ticker]["P/B"]) != str
+        cond_2 = type(value_data[ticker]["P/B"]) != str and value_data[ticker]["P/B"] != float('-inf') and value_data[ticker]["P/B"] != float('inf')
         cond_3 = type(beta_data[ticker]["Beta"]) != str
         cond_4 = type(momentum_data[ticker]["Momentum_Factor"]) != str
         cond_5 = type(investment_data[ticker]["Investment_Factor_AbsVal"]) != str
