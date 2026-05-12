@@ -387,13 +387,8 @@ that feels natural.
 
 With the project open in VSCode:
 
-1. Press **Ctrl+Shift+D** (or click the **Run and Debug** icon).
-2. Pick one of the configurations from the dropdown:
-    - `▶ Run Fama-French strategy (US)`
-    - `▶ Run Fair Value strategy (US)`
-    - `▶ Run strategies_run.py` (both sequentially)
-    - `▶ Run Streamlit Dashboard`
-3. Press **F5**. Answer the prompts in the integrated terminal.
+1. Go to **run.py** file at the project root
+2. Run the code from there.
 
 ### ② From the command line
 
@@ -403,9 +398,7 @@ source venv/bin/activate              # Unix
 .\venv\Scripts\Activate.ps1           # Windows
 
 # Then:
-python -m finviz_us.strategies_run    # both strategies
-python -m finviz_us.data_tickers_and_strats.strat_basic_fama_french.basic_fam_fre
-python -m finviz_us.data_tickers_and_strats.strat_broad_FV.strat_run
+python -m run.py    # both strategies
 ```
 
 > 💡 **Always use `python -m`**, not `python path/to/file.py`. The project
