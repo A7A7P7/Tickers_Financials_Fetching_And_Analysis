@@ -16,7 +16,7 @@
 
 1. [What is this?](#-what-is-this)
 2. [Prerequisites](#-prerequisites)
-3. [🏦🧺📈 Storaging/Caching of ETFs](#-Storaging/Caching-of-ETFs)
+3. [🏦🧺📈 Storaging/Caching of ETFs](###-Storaging/Caching-of-ETFs)
 4. [🚀 Quickstart — from zero to running](#-quickstart--from-zero-to-running)
 5. [Project layout](#-project-layout)
 6. [Running the strategies](#%EF%B8%8F-running-the-strategies)
@@ -96,7 +96,7 @@ git --version
 ## 🏦🧺📈 Storaging/Caching of ETFs
 
 
-#### Step 1 · Seek ETFs Providers
+#### Step 1 · 🔎 Seek ETFs Providers
 
 The program is prepared to **ONLY** handle ETFs from **iShares** (BlackRock Branch)
 & **StateStreet** as one saw them as the most well known ETF providers that
@@ -104,9 +104,9 @@ provided some sort of info through excel files on their holdings.
 
 Donwload the ETFs into a directory of your choice in your device.
 
-#### Step 2 - Transform the ETF Data
+#### Step 2 - 🛠️ Transform the ETF Data
 
-**2.1 - iShares ETF - CURRENTLY EUROPEAN TICKERS ONLY**
+**2.1 - iShares ETF - 🇪🇺 CURRENTLY EUROPEAN TICKERS ONLY**
 
 Whenever you download an ETF from this providers with European tickers,
 you will get .csv files. So this steps must be followed to ensure the program
@@ -114,29 +114,31 @@ reads the ETF
 
 **2.1.1 - TRANSFORM THE CSV FILES TO PRESENT THAT DATA IN EACH CELLS**
 
-**2.1.2 - FIGURE OUT THE DATA RANGE THAT HAS THE TICKERS INFO**
+**2.1.2 - 𝄜 FIGURE OUT THE DATA RANGE THAT HAS THE TICKERS INFO**
 
-**2.1.3 - ERASE ANYTHING THAT IS OUTSIDE THE SCOPE OF THE RANGE WHERE THERE IS TICKER INFO**
+**2.1.3 - ⬜ ERASE ANYTHING THAT IS OUTSIDE THE SCOPE OF THE RANGE WHERE THERE IS TICKER INFO**
 
-**2.1.4 - AFTER ERASING EVERYTHING, SELECT THE ENTIRE RANGE AND MOVE IT TO CELL A1**
+**2.1.4 - ⬜ AFTER ERASING EVERYTHING, SELECT THE ENTIRE RANGE AND MOVE IT TO CELL A1**
 
-**2.1.5 - MAKE SURE TICKERS ON TICKER COLUMN THAT HAVE LETTERS AND NUMBERS ARE NOT IN FORM OF DATES, FOR EXAMPLE 'JUN3' APPEARS IN DATE AND NOT IN TICKER FORM**
+**2.1.5 - 📑 MAKE SURE TICKERS ON TICKER COLUMN THAT HAVE LETTERS AND NUMBERS ARE NOT IN FORM OF DATES, FOR EXAMPLE 'JUN3' APPEARS IN DATE AND NOT IN TICKER FORM**
 
 **AFTER THIS SAVE THE ETF BY KEEPING THE CSV FORMAT WHEN SAVING AND IT IS READY TO BE WORKED**
 
-**2.2 - StateStreet ETFs**
+**2.2 - StateStreet ETFs - 🗺️ WORLDWIDE TICKERS**
+
+NOTE : TICKERS FROM LESS TRANSPARENT MARKETS WILL ALSO HAVE LESS DATA
 
 Whenever you download an ETF from this providers with tickers,
 you will get .xlsx files. So this steps must be followed to ensure the program
 reads the ETF.
 
-**2.2.1 - FIGURE OUT THE DATA RANGE THAT HAS THE TICKERS INFO**
+**2.2.1 - 𝄜 FIGURE OUT THE DATA RANGE THAT HAS THE TICKERS INFO**
 
-**2.2.2 - ERASE ANYTHING THAT IS OUTSIDE THE SCOPE OF THE RANGE WHERE THERE IS TICKER INFO**
+**2.2.2 - ⬜ ERASE ANYTHING THAT IS OUTSIDE THE SCOPE OF THE RANGE WHERE THERE IS TICKER INFO**
 
-**2.2.3 - AFTER ERASING EVERYTHING, SELECT THE ENTIRE RANGE AND MOVE IT TO CELL A1**
+**2.2.3 - ⬜ AFTER ERASING EVERYTHING, SELECT THE ENTIRE RANGE AND MOVE IT TO CELL A1**
 
-**2.2.4 - MAKE SURE TICKERS ON TICKER COLUMN THAT HAVE LETTERS AND NUMBERS ARE NOT IN FORM OF DATES, FOR EXAMPLE 'JUN3' APPEARS IN DATE AND NOT IN TICKER FORM**
+**2.2.4 - 📑 MAKE SURE TICKERS ON TICKER COLUMN THAT HAVE LETTERS AND NUMBERS ARE NOT IN FORM OF DATES, FOR EXAMPLE 'JUN3' APPEARS IN DATE AND NOT IN TICKER FORM**
 
 **AFTER THIS SAVE THE ETF BY KEEPING THE CSV FORMAT WHEN SAVING AND IT IS READY TO BE WORKED**
 
