@@ -124,7 +124,7 @@ reads the ETF
 
 **AFTER THIS SAVE THE ETF BY KEEPING THE CSV FORMAT WHEN SAVING AND IT IS READY TO BE WORKED**
 
-**2.2 - StateStreet ETF - CURRENTLY EUROPEAN TICKERS ONLY**
+**2.2 - StateStreet ETFs**
 
 Whenever you download an ETF from this providers with tickers,
 you will get .xlsx files. So this steps must be followed to ensure the program
@@ -158,7 +158,8 @@ git clone <REPO_URL>
 cd Tickers_Financials_Fetching_And_Analysis
 
 # 3. One-click setup (creates venv + installs everything)
-powershell -ExecutionPolicy Bypass -File    Wanted_Directory\Tickers_Financials_Fetching_And_Analysis\setup.ps1
+powershell -ExecutionPolicy Bypass -File    Wanted_Directory\Tickers_Financials_Fetching_And_Analysis
+\setup.ps1
 
 # 4. Open in VSCode — accept the "Install recommended extensions" prompt
 code .
