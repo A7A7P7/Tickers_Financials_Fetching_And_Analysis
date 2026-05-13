@@ -73,11 +73,19 @@ strat_chosen_finviz = strat_choose(dict_strats_finviz)
 
 #%%
 
+strat_chosen_finviz
+
+#%%
+
 dict_strats_yf = run_with_yf(directory_for_storage_retrieval_yf,dict_all_tickers_all_financials_yf,most_similar_tickers_yf)
 
 #%%
 
 strat_chosen_yf = strat_choose(dict_strats_yf)
+
+#%%
+
+strat_chosen_yf
 
 #%%
 

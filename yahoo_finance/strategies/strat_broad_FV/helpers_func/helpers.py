@@ -348,6 +348,11 @@ def get_tickers_market_prices(tickers_lst:list,dict_all_three_statements:dict):
                     dict_price[ticker] = tickers_price_df.at[tickers_price_df.index[len(tickers_price_df) - 1],('Close',ticker)] * (1/exchange_rate_val)
                     print("PRICE OFF",ticker,"IN EUROS IS",dict_price[ticker])
 
+            else:
+
+                dict_price[ticker] = tickers_price_df.at[tickers_price_df.index[len(tickers_price_df) - 1],('Close',ticker)]
+                print("PRICE OFF",ticker,"IN EUROS IS",dict_price[ticker])
+
     else: #EVERY TICKER IS IN EUROS
 
         dict_price[ticker] = tickers_price_df.at[tickers_price_df.index[len(tickers_price_df) - 1],('Close',ticker)]
