@@ -298,20 +298,63 @@ def get_price_factor(tickers_lst:list,dict_price:dict,dict_df_metrics_organized:
 
 """GET MARKET PRICES FROM yfinance"""
 
-def get_tickers_market_prices(tickers_lst:list):
+def get_tickers_market_prices(tickers_lst:list,dict_all_three_statements:dict):
 
+    dict_inc_stat_tickers = dict_all_three_statements['inc_stat']
+    exchange_rates_needed = []
     dict_price = dict()
-
     end_date = datetime.date.today()
     start_date = datetime.date.today() - pd.Timedelta(days=3)
     tickers_price_df = yf.download(tickers=tickers_lst,start=start_date,end=end_date,interval='1d')
 
     for ticker in tickers_lst:
 
+        df = dict_inc_stat_tickers[ticker]
+        currency_price = df.at["Currency of Prices",df.columns[0]]
+
+        if currency_price != "EUR":
+
+            exchange_currency = "EUR"+currency_price.upper()+"=X"
+
+            if exchange_currency not in exchange_rates_needed:
+
+                exchange_rates_needed.append(exchange_currency)
+
+    if exchange_rates_needed != []:
+
+        #quarter_date = datetime.date.today() - pd.Timedelta(days=90)
+        df_exchange_rates = yf.download(exchange_rates_needed,start = start_date,end = end_date ,interval = '1d')
+
+        for ticker in tickers_lst:
+
+            #WILL USE AN AVERAGE RATE OF PAST 3 MONTHS
+            df = dict_inc_stat_tickers[ticker]
+            currency_price = df.at["Currency of Prices",df.columns[0]]
+            if currency_price.upper() != "EUR":
+
+                if currency_price == "GBp":
+
+                    currency_price = currency_price.upper()
+                    exchange_rate = "EUR"+currency_price+"=X"
+                    exchange_rate_val = df_exchange_rates.at[df_exchange_rates.index[len(df_exchange_rates) - 1],('Close',exchange_rate)]
+                    dict_price[ticker] = tickers_price_df.at[tickers_price_df.index[len(tickers_price_df) - 1],('Close',ticker)] * (1/(exchange_rate_val*100))
+                    print("PRICE OFF",ticker,"IN EUROS IS",dict_price[ticker])
+
+                else:
+
+                    currency_price = currency_price.upper()
+                    exchange_rate = "EUR"+currency_price+"=X"
+                    exchange_rate_val = df_exchange_rates.at[df_exchange_rates.index[len(df_exchange_rates) - 1],('Close',exchange_rate)]
+                    dict_price[ticker] = tickers_price_df.at[tickers_price_df.index[len(tickers_price_df) - 1],('Close',ticker)] * (1/exchange_rate_val)
+                    print("PRICE OFF",ticker,"IN EUROS IS",dict_price[ticker])
+
+    else: #EVERY TICKER IS IN EUROS
+
         dict_price[ticker] = tickers_price_df.at[tickers_price_df.index[len(tickers_price_df) - 1],('Close',ticker)]
-        print("PRICE OFF",ticker,dict_price[ticker])
+        print("PRICE OFF",ticker,"IN EUROS IS",dict_price[ticker])
 
     return dict_price
+
 
 """GET MARKET PRICES FROM STORED TICKERS"""
 
@@ -326,7 +369,7 @@ def get_stored_ticker_prices(directory_for_prices):
 
 """GET MARKET PRICES OR STORED PRICES"""
 
-def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored):
+def choose_mkt_storage_prices(tickers_lst:list,dict_all_three_statements:dict,directory_where_prices_are_stored):
 
     name = "prices"
     stored_prices_exist = input("IS THERE ANY CSV WITH STORAGE OF THE PRICES (ANSWER 'Yes' OR 'No'): ")
@@ -348,7 +391,7 @@ def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored
         if refetch_or_stored.upper() == "YES":
 
             #GET TICKERS RE-FETCHED
-            dict_price = get_tickers_market_prices(tickers_lst)
+            dict_price = get_tickers_market_prices(tickers_lst,dict_all_three_statements)
 
             #IMPORT CSV STORED AND UPDATED THAT LIST WITH THOSE TICKERS
             stored_dict_price = get_stored_ticker_prices(directory_where_prices_are_stored)
@@ -389,7 +432,7 @@ def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored
 
     else: #stored_prices_exist.upper() == "NO"
 
-        dict_price = get_tickers_market_prices(tickers_lst)
+        dict_price = get_tickers_market_prices(tickers_lst,dict_all_three_statements)
 
         #PUT DICT_PRICE INTO CSV
         df_dict_prices = pd.DataFrame(dict_price.values(),dict_price.keys())

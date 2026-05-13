@@ -29,7 +29,7 @@ def choose_strategy(dict_strategies:dict):
         lst_keys.remove(strategy_name)
         size_dict = len(dict_strategies)
 
-        while size_dict != 0:
+        while size_dict > 0:
 
             lst_keys = list(dict_strategies.keys())
             int_strat = int(input(f"CHOOSE AN INTEGER NUMBER FROM 0 TO {size_dict-1}: "))

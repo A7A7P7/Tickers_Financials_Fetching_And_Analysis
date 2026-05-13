@@ -22,7 +22,7 @@ dict_all_tickers_all_financials = organizing_tickers.dict_all_financials_and_tic
 similar_tickers = organizing_tickers.similar_tickers_lst
 #%%
 
-dict_price = helpers.choose_mkt_storage_prices(similar_tickers,directory_for_storage)
+dict_price = helpers.choose_mkt_storage_prices(similar_tickers,dict_all_tickers_all_financials,directory_for_storage)
 
 #%%
 

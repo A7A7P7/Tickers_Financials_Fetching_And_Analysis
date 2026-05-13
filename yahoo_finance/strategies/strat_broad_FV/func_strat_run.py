@@ -6,7 +6,7 @@ from yahoo_finance.strategies.strat_broad_FV.helpers_func import helpers
 
 def run_broad_fv(similar_tickers,dict_all_tickers_all_financials,directory_for_storage_and_retrieval):
 
-    dict_price = helpers.choose_mkt_storage_prices(similar_tickers,directory_for_storage_and_retrieval)
+    dict_price = helpers.choose_mkt_storage_prices(similar_tickers,dict_all_tickers_all_financials,directory_for_storage_and_retrieval)
 
     similar_tickers = helpers.filter_by_min_mkcap(similar_tickers,dict_all_tickers_all_financials['inc_stat'])
 

@@ -2210,6 +2210,7 @@ def final_df_inc_stat(dict_values_per_column:dict,df_inc_index):
     df.loc["EPS (Diluted)"] = df.loc["EPS (Diluted)"] * 1000000
     df.loc["Prices Around Reporting Dates"] = df.loc["Prices Around Reporting Dates"] * 1000000
     df.loc["Prices Around Reporting Dates"] = df.loc["Prices Around Reporting Dates"].round(decimals=2)
+    df.loc["Market Capitalization"] = df.loc["Market Capitalization"] * 1000000
     df = pd.concat([df_period_end,df],axis=0)
     df.loc['Period End Date'] = pd.to_datetime(df.loc['Period End Date']).dt.date
     df_idx_lst = list(df.index)
