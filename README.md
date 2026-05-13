@@ -534,19 +534,23 @@ window — great for debugging one factor at a time.
 
 ### Where to add a new strategy
 
-Drop a new module into `finviz_us/data_tickers_and_strats/` following the
-pattern of `strat_basic_fama_french/`:
+Create a new folder either into:
+`finviz_us/strategies/` or
+`yahoo_finance/strategies/` following the
+pattern of other strategies under `.../strategies/` :
 
 ```
 strat_your_name/
 ├── __init__.py
-├── your_main.py
+├── main.py           #Function running all the functions used in strategy
+├── main_by_cell.py   #All the functions used on "main.py" but separately
 └── your_helpers/
     ├── __init__.py
     └── helpers.py
 ```
 
-Then wire it into `strategies_run.py` or call it directly.
+Then wire it into `run.py` to be usable and avoid 'ModuleErrorNotFound'.
+This 'ModuleErrorNotFound' must be corrected.
 
 ---
 
