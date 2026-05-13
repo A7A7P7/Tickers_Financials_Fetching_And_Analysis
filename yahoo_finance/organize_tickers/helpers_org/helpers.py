@@ -336,6 +336,10 @@ INCOME_STATEMENT_MAP = {
         ("direct",
         ["Currency used in Financial Reporting"]),
     ),
+    "Market Capitalization": (
+        ("direct",
+        ["MkCap"]),
+    )
 }
 
 # =============================================================================
@@ -2801,8 +2805,15 @@ def match_fin_reporting_and_prices_to_same_currency_euro(dict_three_statements_a
 
                         if var not in list_vals_non_multiplying:
 
-                            df.loc[var] = df.loc[var] * val_to_mult
-                            df.loc[var] = df.loc[var].astype(np.float64)
+                            if var == "Market Capitalization" :
+
+                                df.loc[var] = df.loc[var] * val_to_mult * 100 #MKCAP IS NOT IN PENCES EVEN FOR GBX or GBp
+                                df.loc[var] = df.loc[var].astype(np.float64)
+
+                            else:
+
+                                df.loc[var] = df.loc[var] * val_to_mult
+                                df.loc[var] = df.loc[var].astype(np.float64)
 
                     len_df_columns = len(df.columns)
                     standard_currency = ["EUR" for i in range(len_df_columns)]
@@ -2926,28 +2937,25 @@ def add_ons_to_df_inc_stat(dict_inc_stat_tickers:dict,new_tickers:list):
 
             price = df_inc_stat.at["Prices Around Reporting Dates",col]
             shares = df_inc_stat.at["Shares Outstanding (Basic)",col]
+            mcap = df_inc_stat.at["Market Capitalization",col]
 
-            if np.isnan(price) and count_loop==0:
+            if np.isnan(mcap):
 
-                try:
+                price_exist = ~(np.isnan(price))
+                shares_exist = ~(np.isnan(shares))
 
-                    mcap = yf.Ticker(ticker).info["marketCap"]
+                if price_exist and shares_exist:
 
-                except KeyError:
-
-                    print("CURRENT MARKET CAP OF TICKER",ticker,"IS NOT AVAILABLE AT yfinance")
-                    mkcap_list.append(np.nan) #THIS IS ADDED, RETEST THE PROCEDURE.
+                    mcap = price*shares
+                    mkcap_list.append(mcap)
 
                 else:
 
-                    mkcap_list.append(mcap / 1000000) #TO PUT MKCAP IN MILLIONS
+                    mkcap_list.append(np.nan)
 
             else:
 
-                mkcap_val = price*shares if (np.isnan(price) == False and np.isnan(shares) == False) else np.nan
-                mkcap_list.append(mkcap_val)
-
-            count_loop += 1
+                mkcap_list.append(mcap)
 
         rev_series = df_inc_stat.loc["Total Revenue"]
 
@@ -3133,6 +3141,30 @@ def addition_on_financial_statements(dict_three_financials_included:dict,tickers
             df_new_ticker.loc["Currency used in Financial Reporting"] = curr_in_numb_fin_rep
             df_new_ticker.loc["Currency used in Pricing"] = df_new_ticker.loc["Currency used in Pricing"].astype(int)
             df_new_ticker.loc["Currency used in Financial Reporting"] = df_new_ticker.loc["Currency used in Financial Reporting"].astype(int)
+            mkcap_list = []
+
+            try:
+                mcap = yf.Ticker(ticker).info["marketCap"]
+
+            except KeyError:
+
+                print("CURRENT MARKET CAP OF TICKER",ticker,"IS NOT AVAILABLE AT yfinance")
+                mkcap_list = [np.nan for i in range(len_cols)]
+                time.sleep(0.3 + random.uniform(0, 0.3))
+
+            else:
+
+                mkcap_in_millions = mcap / 1000000
+                print("CURRENT MARKET CAP OF TICKER",ticker,"IS",mkcap_in_millions,"MILLIONS")
+                mkcap_list.append(mkcap_in_millions) #TO PUT MKCAP IN MILLIONS
+                for i in range(len_cols-1):
+                    mkcap_list.append(np.nan)
+                time.sleep(0.3 + random.uniform(0, 0.3))
+
+            df_new_ticker.loc["MkCap"] = mkcap_list
+            df_new_ticker.loc["MkCap"] = df_new_ticker.loc["MkCap"].astype(np.float64)
+            dict_inc_stat_tickers[ticker] = df_new_ticker
+
             dict_inc_stat_tickers[ticker] = df_new_ticker
 
     else: #EVERY TICKER DIDN'T EXIST BEFORE NON-EXISTENT PATH, NO NEED TO CREATE, BECAUSE WHENEVER STORAGE OCCUR IT WILL BE CREATED
@@ -3151,6 +3183,29 @@ def addition_on_financial_statements(dict_three_financials_included:dict,tickers
             df_new_ticker.loc["Currency used in Financial Reporting"] = curr_in_numb_fin_rep
             df_new_ticker.loc["Currency used in Pricing"] = df_new_ticker.loc["Currency used in Pricing"].astype(int)
             df_new_ticker.loc["Currency used in Financial Reporting"] = df_new_ticker.loc["Currency used in Financial Reporting"].astype(int)
+            mkcap_list = []
+
+            try:
+                mcap = yf.Ticker(ticker).info["marketCap"]
+
+            except KeyError:
+
+                print("CURRENT MARKET CAP OF TICKER",ticker,"IS NOT AVAILABLE AT yfinance")
+                mkcap_list = [np.nan for i in range(len_cols)]
+                time.sleep(0.3 + random.uniform(0, 0.3))
+
+            else:
+
+                mkcap_in_millions = mcap / 1000000
+                print("CURRENT MARKET CAP OF TICKER",ticker,"IS",mkcap_in_millions,"MILLIONS")
+                mkcap_list.append(mkcap_in_millions) #TO PUT MKCAP IN MILLIONS
+                for i in range(len_cols-1):
+                    mkcap_list.append(np.nan)
+                time.sleep(0.3 + random.uniform(0, 0.3))
+
+            df_new_ticker.loc["MkCap"] = mkcap_list
+            df_new_ticker.loc["MkCap"] = df_new_ticker.loc["MkCap"].astype(np.float64)
+
             dict_inc_stat_tickers[ticker] = df_new_ticker
 
 
@@ -3201,13 +3256,14 @@ def add_on_financials_after_updates(tickers_for_update:list,directory_for_storag
 
         except KeyError:
 
-            print("CURRENT MARKET CAP OF TICKER",ticker,"IS NOT AVAILABLE AT yfinance")
+            print("CURRENT MARKET CAP OF TICKER",ticker,"UPDATED IS NOT AVAILABLE AT yfinance")
             mkcap_list = [np.nan for i in range(len_cols)]
             time.sleep(0.3 + random.uniform(0, 0.3))
 
         else:
 
             mkcap_in_millions = mcap / 1000000
+            print("CURRENT MARKET CAP OF TICKER",ticker,"UPDATED IS",mkcap_in_millions,"MILLIONS")
             mkcap_list.append(mkcap_in_millions) #TO PUT MKCAP IN MILLIONS
             for i in range(len_cols-1):#FIRST VALUE IS 'mkcap_in_millions'
                 mkcap_list.append(np.nan)

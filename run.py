@@ -69,30 +69,25 @@ def strat_choose(dict_strategies:dict):
 
 #%%
 
-dict_strats = run_with_finviz_yf()
-
-#%%
-
 #FIND A WAY TO INCORPORATE MKCAP INTO THE PARQUET FILE THAT IS CACHED.
 
-strat_chosen = strat_choose(dict_strats)
+#%%
+
+#CHOOSE FINVIZ
+
+dict_strats = run_with_finviz_yf()
+strat_chosen_finviz = strat_choose(dict_strats)
 
 #%%
 
-len(strat_chosen['tickers_considered'])
-
-#FROM STRATEGY 'broad_FValue' If Price SCORES IS EMPTY IT MEANS THAT THE TICKERS DIDN'T ACCOMPLISH ALL THE NEEDED PARAMETERS, SOME PARAMETERS ARE LACKING.
-#SAME FOR 'fama_french', IF SOME TICKERS ARE NOT THERE IT MEANS SOME DATA MIGHT BE MISSING, OR THE COMPANY DOESN'T FULLFILL SOME SET OF CRITERIA
+finviz_tickers_yield_metrics =
 
 #%%
 
-from finviz_us.helpers_file_root import helpers_root
-from yahoo_finance.organize_tickers import organizing_tickers
-from yahoo_finance.strategies.strat_broad_FV.func_strat_run import run_broad_fv
-from yahoo_finance.strategies.strat_basic_fama_french.func_run_strat import run_basic_fam_fre
+#CHOOSE yfinance
 
-directory_for_storage_retrieval = organizing_tickers.directory_for_storage_or_retrieval
-dict_all_tickers_all_financials = organizing_tickers.dict_all_financials_and_tickers
-most_similar_tickers = organizing_tickers.similar_tickers_lst
+dict_strats = run_with_finviz_yf()
+strat_chosen_yfinance = strat_choose(dict_strats)
 
+#%%
 

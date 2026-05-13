@@ -364,8 +364,18 @@ def choose_mkt_storage_prices(tickers_lst:list,directory_where_prices_are_stored
 
                 if ticker not in stored_dict_price.keys():
 
-                    dict_price[ticker] = float(fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Price'])
-                    time.sleep(0.3)
+                    try:
+
+                        price = float(fvf.finvizfinance(ticker).ticker_full_info()['fundament']['Price'])
+
+                    except:
+
+                        print("TICKER",ticker,"IS NOT PRESENT IN FINVIZ ANYMORE")
+
+                    else:
+
+                        dict_price[ticker] = price
+                        time.sleep(0.3)
 
                 else:
 
