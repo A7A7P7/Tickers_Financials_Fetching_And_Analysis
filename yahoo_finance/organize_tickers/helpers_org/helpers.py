@@ -2510,10 +2510,10 @@ def prices_near_reporting(dict_inc_stat_tickers:dict,new_tickers:list):
 
     for lst in lst_different_comparables:
 
-        end_date = datetime.date.today() - pd.Timedelta(days=1)
+        current_date = datetime.date.today() - pd.Timedelta(days=1)
 
         #'dates_of_reporting_comparable' already ensures that lst[0] tickers has the highest number of columns
-        start_date = dict_inc_stat_tickers[lst[0]].columns[len(dict_inc_stat_tickers[lst[0]].columns)-1]
+        start_date_lst_comparables = dict_inc_stat_tickers[lst[0]].columns[len(dict_inc_stat_tickers[lst[0]].columns)-1]
 
         #PRICING DOWNLOAD
         comp_tickers_df = yf.download(tickers=lst,start=start_date,end=end_date,interval='1d')
@@ -2543,7 +2543,7 @@ def prices_near_reporting(dict_inc_stat_tickers:dict,new_tickers:list):
                 else:
 
                     earnings_of_interest = num_of_earnings_compared_to_years(df_ticker_columns,ticker_earnings_ind)
-                    print("GETTING PRICES NEAR REPORTING FOR TICKER",ticker,"WHERE 'start' IS",start_date,"AND 'end' IS",end_date)
+                    print("GETTING PRICES NEAR REPORTING FOR TICKER",ticker,"WHERE 'start' IS",start_date_lst_comparables,"AND 'end' IS",current_date)
                     for earnings_date in earnings_of_interest:
 
                         if type(earnings_date) == float : #nan equals a float
